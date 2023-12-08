@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterRocketDesigns", "BetterRocketDesigns\BetterRocketDesigns.csproj", "{2106C78E-F03D-4753-8106-FFEDD962DE83}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2106C78E-F03D-4753-8106-FFEDD962DE83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2106C78E-F03D-4753-8106-FFEDD962DE83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2106C78E-F03D-4753-8106-FFEDD962DE83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2106C78E-F03D-4753-8106-FFEDD962DE83}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {461A0C33-8D7F-48FD-B3D3-421AA81F3B3D}
+	EndGlobalSection
+EndGlobal
