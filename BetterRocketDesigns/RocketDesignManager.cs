@@ -5,10 +5,10 @@ namespace BetterRocketDesigns
     internal class RocketDesignManager
     {
         private List<RocketDesign> cachedRocketDesigns;
-        private IRocketDesignLoader<IConfigNodeAdapter> rocketDesignLoader;
+        private IRocketDesignLoader rocketDesignLoader;
         /*private ITagStorage tagStorage;*/
 
-        public RocketDesignManager(IRocketDesignLoader<IConfigNodeAdapter> rocketDesignLoader)
+        public RocketDesignManager(IRocketDesignLoader rocketDesignLoader)
         {
             this.rocketDesignLoader = rocketDesignLoader;
             /*this.tagStorage = tagStorage;*/
@@ -38,27 +38,19 @@ namespace BetterRocketDesigns
             return cachedRocketDesigns;
         }
 
-        public RocketDesign SaveOrReplaceAsRocketDesign(IConfigNodeAdapter configNode)
+        public RocketDesign SaveOrReplaceAsRocketDesign(RocketDesign rocketDesign)
         {
-            RocketDesign newRocketDesign = new RocketDesign
-            {
-                Name = configNode.GetValue("ship"),
-                ConfigNode = configNode
-            };
+            rocketDesignLoader.SaveRocketDesign(rocketDesign.Name, rocketDesign.ConfigNode);
 
-            /*tagStorage.LoadTags(newRocketDesign);*/
-
-            rocketDesignLoader.SaveRocketDesign(newRocketDesign.Name, newRocketDesign.ConfigNode);
-
-            int index = cachedRocketDesigns.FindIndex(rd => rd.Name == newRocketDesign.Name);
+            int index = cachedRocketDesigns.FindIndex(rd => rd.Name == rocketDesign.Name);
             if (index != -1)
             {
                 cachedRocketDesigns.RemoveAt(index);
             }
 
-            cachedRocketDesigns.Add(newRocketDesign);
+            cachedRocketDesigns.Add(rocketDesign);
 
-            return newRocketDesign;
+            return rocketDesign;
         }
         public List<RocketDesign> Filter(string filterCriteria)
         {

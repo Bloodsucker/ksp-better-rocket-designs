@@ -2,9 +2,9 @@
 
 namespace BetterRocketDesigns
 {
-    internal interface IRocketDesignLoader<T> where T : IConfigNodeAdapter
+    internal interface IRocketDesignLoader
     {
-        List<T> LoadAllRocketDesigns();
-        void SaveRocketDesign(string fileName, T configNode);
+        List<IConfigNodeAdapter> LoadAllRocketDesigns();
+        void SaveRocketDesign(string fileName, IConfigNodeAdapter configNode);
     }
 }

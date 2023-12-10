@@ -38,9 +38,17 @@ namespace BetterRocketDesigns.RocketDesignSaver
 
         private void HandleSaveButtonClicked(string name)
         {
-            rocketDesignManager.SaveOrReplaceAsRocketDesign(newConfigNode);
+            newConfigNode.SetValue("ship", name);
 
-            this.ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
+            RocketDesign newRocketDesign = new RocketDesign
+            {
+                Name = newConfigNode.GetValue("ship"),
+                ConfigNode = newConfigNode
+            };
+
+            rocketDesignManager.SaveOrReplaceAsRocketDesign(newRocketDesign);
+
+            MonoBehaviour.Destroy(ui.gameObject);
         }
     }
 }

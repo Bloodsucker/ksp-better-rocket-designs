@@ -4,7 +4,7 @@ using System.IO;
 
 namespace BetterRocketDesigns.ksp
 {
-    internal class RocketDesignLoader : IRocketDesignLoader<IConfigNodeAdapter>
+    internal class RocketDesignLoader : IRocketDesignLoader
     {
         private string saveDirectoryPath;
         private const string ROCKET_DESIGN_SAVE_FOLDER_NAME = "RocketDesigns";

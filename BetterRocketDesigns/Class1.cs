@@ -12,7 +12,6 @@ namespace BetterRocketDesigns
         private ApplicationLauncherButton toolbarButton;
         private Part detachedPart;
 
-        private RocketDesignSaverUI rocketDesignSaverUI;
         private RocketDesignSaverController rocketDesignSaverController;
 
         private void Start()
