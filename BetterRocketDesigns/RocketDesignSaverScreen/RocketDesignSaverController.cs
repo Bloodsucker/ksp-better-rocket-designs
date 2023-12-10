@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace BetterRocketDesigns.RocketDesignSaver
+namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverController
     {
@@ -20,7 +20,6 @@ namespace BetterRocketDesigns.RocketDesignSaver
             this.ui.OnSaveButtonClicked += HandleSaveButtonClicked;
             this.ui.OnCancelButtonClicked += HandleCancelClicked;
 
-            this.ui.Init();
             this.ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
         }
 

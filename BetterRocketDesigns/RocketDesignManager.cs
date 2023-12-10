@@ -4,20 +4,22 @@ namespace BetterRocketDesigns
 {
     internal class RocketDesignManager
     {
-        private List<RocketDesign> cachedRocketDesigns;
-        private IRocketDesignLoader rocketDesignLoader;
+        private List<RocketDesign> _cachedRocketDesigns;
+        private IRocketDesignLoader _rocketDesignLoader;
         /*private ITagStorage tagStorage;*/
 
         public RocketDesignManager(IRocketDesignLoader rocketDesignLoader)
         {
-            this.rocketDesignLoader = rocketDesignLoader;
+            this._rocketDesignLoader = rocketDesignLoader;
             /*this.tagStorage = tagStorage;*/
-            cachedRocketDesigns = new List<RocketDesign>();
+            _cachedRocketDesigns = new List<RocketDesign>();
         }
 
         public void LoadAllRocketDesigns()
         {
-            List<IConfigNodeAdapter> configNodes = rocketDesignLoader.LoadAllRocketDesigns();
+            List<RocketDesign> cachedRocketDesigns = new List<RocketDesign>();
+
+            List<IConfigNodeAdapter> configNodes = _rocketDesignLoader.LoadAllRocketDesigns();
 
             foreach (var configNode in configNodes)
             {
@@ -27,28 +29,28 @@ namespace BetterRocketDesigns
                     ConfigNode = configNode,
                 };
 
-                /*tagStorage.LoadTags(rocketDesign);*/
-
                 cachedRocketDesigns.Add(rocketDesign);
             }
+
+            this._cachedRocketDesigns = cachedRocketDesigns;
         }
 
         public List<RocketDesign> GetCachedRocketDesigns()
         {
-            return cachedRocketDesigns;
+            return _cachedRocketDesigns;
         }
 
         public RocketDesign SaveOrReplaceAsRocketDesign(RocketDesign rocketDesign)
         {
-            rocketDesignLoader.SaveRocketDesign(rocketDesign.Name, rocketDesign.ConfigNode);
+            _rocketDesignLoader.SaveRocketDesign(rocketDesign.Name, rocketDesign.ConfigNode);
 
-            int index = cachedRocketDesigns.FindIndex(rd => rd.Name == rocketDesign.Name);
+            int index = _cachedRocketDesigns.FindIndex(rd => rd.Name == rocketDesign.Name);
             if (index != -1)
             {
-                cachedRocketDesigns.RemoveAt(index);
+                _cachedRocketDesigns.RemoveAt(index);
             }
 
-            cachedRocketDesigns.Add(rocketDesign);
+            _cachedRocketDesigns.Add(rocketDesign);
 
             return rocketDesign;
         }
@@ -56,7 +58,7 @@ namespace BetterRocketDesigns
         {
             List<RocketDesign> filteredRocketDesigns = new List<RocketDesign>();
 
-            foreach(RocketDesign rocketDesign in cachedRocketDesigns)
+            foreach(RocketDesign rocketDesign in _cachedRocketDesigns)
             {
                 if(rocketDesign.Name.Contains(filterCriteria))
                 {

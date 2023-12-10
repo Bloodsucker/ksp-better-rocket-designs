@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace BetterRocketDesigns.RocketDesignSaver
+namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverUI : MonoBehaviour
     {
@@ -14,6 +14,7 @@ namespace BetterRocketDesigns.RocketDesignSaver
         private List<RocketDesign> filteredRocketDesigns;
         private bool saveButtonAsReplaceButton;
 
+        private int _windowId;
         private string filterTextInputText;
         private Rect _windowPosition;
         private Vector2 filteredRocketDesignScrollPosition;
@@ -27,16 +28,11 @@ namespace BetterRocketDesigns.RocketDesignSaver
 
         private void Start()
         {
+            _windowId = GetInstanceID();
             _windowPosition = new Rect();
             saveButtonAsReplaceButton = false;
 
             InitStyle();
-
-        }
-
-        public void Init()
-        {
-            // Nothing at the moment.
         }
 
         public void UpdateFilteredRocketDesigns(List<RocketDesign> rocketDesigns) {
@@ -79,7 +75,7 @@ namespace BetterRocketDesigns.RocketDesignSaver
 
         private void OnGUI()
         {
-            _windowPosition = GUILayout.Window(0, _windowPosition, OnWindow, "Save Rocket Design as", rocketDesignSaverWindowStyle);
+            _windowPosition = GUILayout.Window(_windowId, _windowPosition, OnWindow, "Save Rocket Design as", rocketDesignSaverWindowStyle);
         }
 
         private void OnWindow(int windowId)
