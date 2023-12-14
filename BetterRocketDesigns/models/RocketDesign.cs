@@ -14,7 +14,9 @@ namespace BetterRocketDesigns
 
         public Texture2D ThumbnailImage {  get ; set; }
 
-        public Dictionary<string, Dictionary<string, float>> tags { get; set; }
+        public List<string> Labels {  get; set; }
+
+        public Dictionary<string, float> Capabilities { get; set; }
 
         public IConfigNodeAdapter ConfigNode { get; set; }
     }

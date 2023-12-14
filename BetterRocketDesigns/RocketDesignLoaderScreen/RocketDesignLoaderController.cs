@@ -32,6 +32,10 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
                 MonoBehaviour.Destroy(_ui.gameObject);
             }
+            else
+            {
+                Debug.LogError("RocketDesign#ConfigNode is not ConfigNodeAdapter type.");
+            }
         }
 
         public void HandleCancelClicked()
