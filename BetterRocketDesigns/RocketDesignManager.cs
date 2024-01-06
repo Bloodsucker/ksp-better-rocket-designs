@@ -21,11 +21,7 @@ namespace BetterRocketDesigns
 
             foreach (var configNode in configNodes)
             {
-                RocketDesign rocketDesign = new RocketDesign
-                {
-                    Name = configNode.GetValue("ship"),
-                    ConfigNode = configNode,
-                };
+                RocketDesign rocketDesign = new RocketDesign(configNode);
 
                 cachedRocketDesigns.Add(rocketDesign);
             }

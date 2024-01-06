@@ -6,23 +6,23 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverController
     {
-        private readonly IConfigNodeAdapter newConfigNode;
+        private readonly IConfigNodeAdapter _newConfigNode;
         private readonly RocketDesignSaverUI _ui;
         private readonly RocketDesignManager _rocketDesignManager;
         public event Action OnComplete;
 
         public RocketDesignSaverController(IConfigNodeAdapter newConfigNode, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
         {
-            this.newConfigNode = newConfigNode;
+            _newConfigNode = newConfigNode;
 
-            this._ui = ui;
-            this._rocketDesignManager = rocketDesignManager;
+            _ui = ui;
+            _rocketDesignManager = rocketDesignManager;
 
-            this._ui.OnFilterChanged += HandleFilterChanged;
-            this._ui.OnSaveButtonClicked += HandleSaveButtonClicked;
-            this._ui.OnCancelButtonClicked += HandleCancelClicked;
+            _ui.OnFilterChanged += HandleFilterChanged;
+            _ui.OnSaveButtonClicked += HandleSaveButtonClicked;
+            _ui.OnCancelButtonClicked += HandleCancelClicked;
 
-            this._ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
+            _ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
         }
 
         public void HandleCancelClicked()
@@ -35,17 +35,14 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria );
 
-            this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+            _ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
         }
 
         private void HandleSaveButtonClicked(string name)
         {
-            newConfigNode.SetValue("ship", name);
-
-            RocketDesign newRocketDesign = new RocketDesign
+            RocketDesign newRocketDesign = new RocketDesign(_newConfigNode)
             {
-                Name = newConfigNode.GetValue("ship"),
-                ConfigNode = newConfigNode
+                Name = name
             };
 
             _rocketDesignManager.SaveOrReplaceAsRocketDesign(newRocketDesign);

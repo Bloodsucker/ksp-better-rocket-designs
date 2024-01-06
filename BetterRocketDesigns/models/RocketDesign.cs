@@ -12,8 +12,11 @@ namespace BetterRocketDesigns
         private List<string> _labels;
         private Dictionary<string, float> _capabilities;
 
-        public RocketDesign() {
+        public RocketDesign(IConfigNodeAdapter configNode) {
             ThumbnailImage = Tools.MakeTexture(32, 32, Color.magenta);
+            _configNode = configNode;
+
+            UpdatePropertiesFromConfigNode();
         }
 
         public string Name
