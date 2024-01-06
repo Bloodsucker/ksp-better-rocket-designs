@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace BetterRocketDesigns.utils
 {
@@ -27,8 +28,17 @@ namespace BetterRocketDesigns.utils
             value = new Dictionary<string, float>();
 
             ConfigNode dicConfigNode = configNode.GetNode(name);
+            if (dicConfigNode == null)
+            {
+                return;
+            }
+
             List<string> dicKeys = dicConfigNode.GetValuesList("keys");
             ConfigNode kvpConfigNode = dicConfigNode.GetNode("kvp");
+            if(kvpConfigNode == null)
+            {
+                Debug.Log("Incorrect serialized ConfigNode Dictionary structure (kvp)");
+            }
 
             foreach(var dicKey in dicKeys)
             {
