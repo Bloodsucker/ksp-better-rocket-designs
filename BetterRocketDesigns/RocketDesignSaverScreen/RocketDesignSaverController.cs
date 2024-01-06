@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BetterRocketDesigns.RocketDesignSaverScreen
@@ -6,33 +7,35 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
     internal class RocketDesignSaverController
     {
         private readonly IConfigNodeAdapter newConfigNode;
-        private readonly RocketDesignSaverUI ui;
-        private readonly RocketDesignManager rocketDesignManager;
+        private readonly RocketDesignSaverUI _ui;
+        private readonly RocketDesignManager _rocketDesignManager;
+        public event Action OnComplete;
 
         public RocketDesignSaverController(IConfigNodeAdapter newConfigNode, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
         {
             this.newConfigNode = newConfigNode;
 
-            this.ui = ui;
-            this.rocketDesignManager = rocketDesignManager;
+            this._ui = ui;
+            this._rocketDesignManager = rocketDesignManager;
 
-            this.ui.OnFilterChanged += HandleFilterChanged;
-            this.ui.OnSaveButtonClicked += HandleSaveButtonClicked;
-            this.ui.OnCancelButtonClicked += HandleCancelClicked;
+            this._ui.OnFilterChanged += HandleFilterChanged;
+            this._ui.OnSaveButtonClicked += HandleSaveButtonClicked;
+            this._ui.OnCancelButtonClicked += HandleCancelClicked;
 
-            this.ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
+            this._ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
         }
 
         public void HandleCancelClicked()
         {
-            MonoBehaviour.Destroy(ui.gameObject);
+            MonoBehaviour.Destroy(_ui.gameObject);
+            OnComplete.Invoke();
         }
 
         private void HandleFilterChanged(string filterCriteria)
         {
-            List<RocketDesign> filteredRocketDesigns = rocketDesignManager.Filter(filterCriteria );
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria );
 
-            this.ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+            this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
         }
 
         private void HandleSaveButtonClicked(string name)
@@ -45,9 +48,16 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 ConfigNode = newConfigNode
             };
 
-            rocketDesignManager.SaveOrReplaceAsRocketDesign(newRocketDesign);
+            _rocketDesignManager.SaveOrReplaceAsRocketDesign(newRocketDesign);
 
-            MonoBehaviour.Destroy(ui.gameObject);
+            MonoBehaviour.Destroy(_ui.gameObject);
+
+            OnComplete.Invoke();
+        }
+
+        public void Close()
+        {
+            MonoBehaviour.Destroy(_ui.gameObject);
         }
     }
 }

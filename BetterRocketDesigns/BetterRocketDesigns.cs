@@ -26,14 +26,6 @@ namespace BetterRocketDesigns
             _rocketDesignManager = new RocketDesignManager(rocketDesignLoader);
             _rocketDesignManager.LoadAllRocketDesigns();
 
-            _rocketDesignSaverToolbarButton = ApplicationLauncher.Instance.AddModApplication(
-                OnRocketDesignSaverToolbarButtonIn,
-                OnRocketDesignSaverToolbarButtonOut,
-                DummyMethod, DummyMethod,
-                DummyMethod, DummyMethod,
-                ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
-                Tools.MakeTexture(32, 32, Color.blue));
-
             _rocketDesignLoaderToolbarButton = ApplicationLauncher.Instance.AddModApplication(
                 OnRocketDesignLoaderToolbarButtonIn,
                 OnRocketDesignLoaderToolbarButtonOut,
@@ -44,6 +36,27 @@ namespace BetterRocketDesigns
 
             GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
         }
+
+        private void ShowSaveToolbarButton()
+        {
+            _rocketDesignSaverToolbarButton = ApplicationLauncher.Instance.AddModApplication(
+                OnRocketDesignSaverToolbarButtonIn,
+                OnRocketDesignSaverToolbarButtonOut,
+                DummyMethod, DummyMethod,
+                DummyMethod, DummyMethod,
+                ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
+                Tools.MakeTexture(32, 32, Color.blue));
+        }
+
+        private void HideSaveToolbarButton()
+        {
+            if(_rocketDesignSaverToolbarButton)
+            {
+                ApplicationLauncher.Instance.RemoveModApplication(_rocketDesignSaverToolbarButton);
+                _rocketDesignSaverToolbarButton = null;
+            }
+        }
+
         private void OnRocketDesignLoaderToolbarButtonIn()
         {
             RocketDesignLoaderUI rocketDesignLoaderUI = new GameObject("RocketDesignLoaderUI")
@@ -51,14 +64,15 @@ namespace BetterRocketDesigns
 
             _rocketDesignLoaderController = new RocketDesignLoaderController(rocketDesignLoaderUI, _rocketDesignManager);
 
-            rocketDesignLoaderUI.OnCancelButtonClicked += delegate {
-                _rocketDesignLoaderToolbarButton.SetFalse(true);
+            _rocketDesignLoaderController.OnComplete += delegate
+            {
+                _rocketDesignLoaderToolbarButton?.SetFalse(true);
             };
         }
 
         private void OnRocketDesignLoaderToolbarButtonOut()
         {
-            _rocketDesignLoaderController?.HandleCancelClicked();
+            _rocketDesignLoaderController?.Close();
             _rocketDesignLoaderController = null;
         }
 
@@ -71,30 +85,33 @@ namespace BetterRocketDesigns
                 return;
             };
 
-            // Convert Part into a configNode
-            ShipConstruct draggedShipConstruct = new ShipConstruct();
-            draggedShipConstruct.Add(detachedPart);
-            IConfigNodeAdapter configNode = new ConfigNodeAdapter(draggedShipConstruct.SaveShip());
+            ConfigNode cn = CraftTools.TransformAsConfigNode(detachedPart);
+            ConfigNodeAdapter configNode = new ConfigNodeAdapter(cn);
 
             RocketDesignSaverUI rocketDesignSaverUI = new GameObject("RocketDesignSaverUI")
-                .AddComponent<RocketDesignSaverUI>();
+                 .AddComponent<RocketDesignSaverUI>();
 
             rocketDesignSaverController = new RocketDesignSaverController(configNode, rocketDesignSaverUI, _rocketDesignManager);
 
-            rocketDesignSaverUI.OnCancelButtonClicked += delegate {
-                _rocketDesignSaverToolbarButton.SetFalse(true);
+            rocketDesignSaverController.OnComplete += delegate
+            {
+                _rocketDesignSaverToolbarButton?.SetFalse(true);
             };
         }
 
         private void OnRocketDesignSaverToolbarButtonOut()
         {
-            rocketDesignSaverController?.HandleCancelClicked();
+            rocketDesignSaverController?.Close();
             rocketDesignSaverController = null;
         }
 
         private void OnDestroy()
         {
             GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
+
+            HideSaveToolbarButton();
+
+            ApplicationLauncher.Instance.RemoveModApplication(_rocketDesignLoaderToolbarButton);
         }
 
         private void OnEditorPartEvent(ConstructionEventType eventType, Part part)
@@ -109,12 +126,14 @@ namespace BetterRocketDesigns
                 case ConstructionEventType.PartCopied:
                     Debug.Log("Part dragged START: " + Enum.GetName(typeof(ConstructionEventType), eventType));
                     detachedPart = part;
+                    ShowSaveToolbarButton();
                     break;
                 case ConstructionEventType.PartDropped:
                 case ConstructionEventType.PartAttached:
                 case ConstructionEventType.PartDeleted:
                     Debug.Log("Part dragged STOP: " + Enum.GetName(typeof(ConstructionEventType), eventType));
                     detachedPart = null;
+                    HideSaveToolbarButton();
                     break;
             }
         }

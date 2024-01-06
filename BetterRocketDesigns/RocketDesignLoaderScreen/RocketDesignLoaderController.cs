@@ -1,5 +1,6 @@
 ﻿using BetterRocketDesigns.ksp;
 using KSP;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
     {
         private readonly RocketDesignLoaderUI _ui;
         private readonly RocketDesignManager _rocketDesignManager;
+        public event Action OnComplete;
 
         public RocketDesignLoaderController(RocketDesignLoaderUI ui, RocketDesignManager rocketDesignManager) { 
             _ui = ui;
@@ -31,6 +33,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
                 EditorLogic.fetch.SpawnTemplate(subassembly);
 
                 MonoBehaviour.Destroy(_ui.gameObject);
+                OnComplete.Invoke();
             }
             else
             {
@@ -41,6 +44,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         public void HandleCancelClicked()
         {
             MonoBehaviour.Destroy(_ui.gameObject);
+            OnComplete.Invoke();
         }
 
         private void HandleFilterChanged(string filterCriteria)
@@ -48,6 +52,11 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
 
             this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+        }
+
+        public void Close()
+        {
+            MonoBehaviour.Destroy(_ui.gameObject);
         }
     }
 }
