@@ -64,10 +64,8 @@
   <ItemGroup>
     <Compile Include="ksp\ConfigNodeAdapter.cs" />
     <Compile Include="BetterRocketDesigns.cs" />
-    <Compile Include="GameLabelsManager.cs" />
     <Compile Include="adapters\IConfigNodeAdapter.cs" />
     <Compile Include="IRocketDesignLoader.cs" />
-    <Compile Include="ITagStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="models\RocketDesign.cs" />
     <Compile Include="ksp\RocketDesignLoader.cs" />
@@ -76,6 +74,7 @@
     <Compile Include="RocketDesignManager.cs" />
     <Compile Include="RocketDesignSaverScreen\RocketDesignSaverController.cs" />
     <Compile Include="RocketDesignSaverScreen\RocketDesignSaverUI.cs" />
+    <Compile Include="utils\ConfigNodeTools.cs" />
     <Compile Include="utils\CraftTools.cs" />
     <Compile Include="utils\Tools.cs" />
   </ItemGroup>

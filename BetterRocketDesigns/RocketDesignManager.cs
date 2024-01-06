@@ -6,12 +6,10 @@ namespace BetterRocketDesigns
     {
         private List<RocketDesign> _cachedRocketDesigns;
         private IRocketDesignLoader _rocketDesignLoader;
-        /*private ITagStorage tagStorage;*/
 
         public RocketDesignManager(IRocketDesignLoader rocketDesignLoader)
         {
             this._rocketDesignLoader = rocketDesignLoader;
-            /*this.tagStorage = tagStorage;*/
             _cachedRocketDesigns = new List<RocketDesign>();
         }
 
