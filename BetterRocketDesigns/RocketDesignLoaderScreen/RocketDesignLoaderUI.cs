@@ -85,10 +85,36 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             {
                 RocketDesign rocketDesign = this.filteredRocketDesigns[i];
 
+                string buttonText = $"<b>{rocketDesign.Name}</b>";
+
+                string labelsButtonText = "";
+
+                foreach(var label in rocketDesign.Labels)
+                {
+                    labelsButtonText += $"{label} - ";
+                }
+
+                if (rocketDesign.Labels.Count > 0)
+                {
+                    buttonText += $"\n{labelsButtonText}";
+                }
+
+                string capabilitiesButtonText = "";
+
+                foreach (var kvp in rocketDesign.Capabilities)
+                {
+                    capabilitiesButtonText += $"{kvp.Key}: {kvp.Value}; ";
+                }
+
+                if (rocketDesign.Capabilities.Count > 0)
+                {
+                    buttonText += $"\nCap: {capabilitiesButtonText}";
+                }
+
                 GUIContent buttonContent = new GUIContent
                 {
                     image = rocketDesign.ThumbnailImage,
-                    text = rocketDesign.Name,
+                    text = buttonText,
                     tooltip = $"Load: {rocketDesign.Name}",
                 };
 
