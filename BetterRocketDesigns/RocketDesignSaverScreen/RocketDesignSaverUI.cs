@@ -17,11 +17,11 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private bool saveButtonAsReplaceButton;
 
         private int _windowId;
-        private string filterTextInputText;
+        private string filterTextInputText = "";
         private Rect _windowPosition;
         private Vector2 filteredRocketDesignScrollPosition;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
-        private string newRocketDesignNewLabelInputText;
+        private string newRocketDesignNewLabelInputText = "";
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
@@ -96,60 +96,53 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
 
             #region top-section
+            GUILayout.BeginHorizontal();
             filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
 
             if (GUI.changed)
             {
                 HandleFilterTextInputChange(filterTextInputText);
             }
-            #endregion
 
-            #region middle-section
+            GUI.enabled = filterTextInputText.Length != 0;
 
-            #region left-column
-            GUILayout.BeginHorizontal();
-
-            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
-
-            OnWindowFilterLabelsColumn();
-
-            GUILayout.EndVertical();
-            #endregion
-
-            #region middle-column
-            GUILayout.BeginVertical(GUILayout.Height(150f), GUILayout.ExpandWidth(true));
-
-            OnWindowDrawFilteredRocketDesignsColumn();
-
-            GUILayout.EndVertical();
-            #endregion
-
-            #region right-column
-            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
-
-            OnWindowDrawNewLabelsColumn();
-
-            GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
-            #endregion
-            #endregion
-
-            GUILayout.BeginHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(saveButtonAsReplaceButton ? "replace" : "save", saveOrReplaceButtonStyle))
+            if (GUILayout.Button(saveButtonAsReplaceButton ? "Replace" : "Save", saveOrReplaceButtonStyle))
             {
                 HandleSaveButtonClick();
             }
+
+            GUI.enabled = true;
 
             if (GUILayout.Button("Cancel", cancelButtonStyle))
             {
                 HandleCancelButtonClick();
             }
+            GUILayout.EndHorizontal();
+            #endregion
+
+            #region middle-section
+            GUILayout.BeginHorizontal();
+
+            #region left-column
+            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
+            OnWindowFilterLabelsColumn();
+            GUILayout.EndVertical();
+            #endregion
+
+            #region middle-column
+            GUILayout.BeginVertical(GUILayout.Height(300f), GUILayout.Width(_windowPosition.width / 3));
+            OnWindowDrawFilteredRocketDesignsColumn();
+            GUILayout.EndVertical();
+            #endregion
+
+            #region right-column
+            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
+            OnWindowDrawNewLabelsColumn();
+            GUILayout.EndVertical();
+            #endregion
 
             GUILayout.EndHorizontal();
+            #endregion
 
             GUI.DragWindow();
         }
@@ -199,7 +192,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 {
                     GUILayout.BeginHorizontal();
 
-                    if (GUILayout.Button("x", newRocketDesignNewLabelRemoveButtonStyle))
+                    if (GUILayout.Button("X", newRocketDesignNewLabelRemoveButtonStyle))
                     {
                         // TODO
                         _newRocketDesign.Labels = _newRocketDesign.Labels.Where(label => label != labelName).ToList();
@@ -219,6 +212,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             GUILayout.BeginHorizontal();
             newRocketDesignNewLabelInputText = GUILayout.TextField(newRocketDesignNewLabelInputText, newRocketDesignNewLabelTextFieldStyle);
 
+            GUI.enabled = newRocketDesignNewLabelInputText.Length != 0;
             if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
             {
                 // TODO
@@ -226,6 +220,9 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
                 newRocketDesignNewLabelInputText = "";
             }
+
+            GUI.enabled = true;
+
             GUILayout.EndHorizontal();
         }
 
