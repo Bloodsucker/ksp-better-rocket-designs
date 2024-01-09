@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         public event Action<string> OnSaveButtonClicked;
         public event Action OnCancelButtonClicked;
 
+        private RocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
         private bool saveButtonAsReplaceButton;
 
@@ -18,6 +20,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private string filterTextInputText;
         private Rect _windowPosition;
         private Vector2 filteredRocketDesignScrollPosition;
+        private Vector2 newRocketDesignNewLabelsScrollPosition;
+        private string newRocketDesignNewLabelInputText;
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
@@ -25,6 +29,15 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle saveOrReplaceButtonStyle;
         private GUIStyle cancelButtonStyle;
+        private GUIStyle newRocketDesignNewLabelsScrollViewStyle;
+        private GUIStyle newRocketDesignNewLabelRemoveButtonStyle;
+        private GUIStyle newRocketDesignNewLabelTextFieldStyle;
+        private GUIStyle newRocketDesignNewLabelAddButtonStyle;
+
+        public void Init(RocketDesign newRocketDesign)
+        {
+            _newRocketDesign = newRocketDesign;
+        }
 
         private void Start()
         {
@@ -35,7 +48,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             InitStyle();
         }
 
-        public void UpdateFilteredRocketDesigns(List<RocketDesign> rocketDesigns) {
+        public void UpdateFilteredRocketDesigns(List<RocketDesign> rocketDesigns)
+        {
             this.filteredRocketDesigns = rocketDesigns;
         }
 
@@ -45,7 +59,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             foreach (RocketDesign rocketDesign in this.filteredRocketDesigns)
             {
-                if(rocketDesign.Name == newFilterText)
+                if (rocketDesign.Name == newFilterText)
                 {
                     saveButtonAsReplaceButton = true;
                     break;
@@ -80,37 +94,46 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindow(int windowId)
         {
+
+            #region top-section
             filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
 
-            if(GUI.changed)
+            if (GUI.changed)
             {
                 HandleFilterTextInputChange(filterTextInputText);
             }
+            #endregion
 
-            GUILayout.BeginVertical(GUILayout.Height(150f));
+            #region middle-section
 
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle);
+            #region left-column
+            GUILayout.BeginHorizontal();
 
-            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
-            {
-                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
+            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
 
-                GUIContent buttonContent = new GUIContent
-                {
-                    image = rocketDesign.ThumbnailImage,
-                    text = rocketDesign.Name,
-                    tooltip = $"Select: {rocketDesign.Name}",
-                };
-
-                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle, GUILayout.ExpandWidth(true)))
-                {
-                    HandleExistingRocketdesignButtonClick(i, rocketDesign);
-                }
-            }
-
-            GUILayout.EndScrollView();
+            OnWindowFilterLabelsColumn();
 
             GUILayout.EndVertical();
+            #endregion
+
+            #region middle-column
+            GUILayout.BeginVertical(GUILayout.Height(150f), GUILayout.ExpandWidth(true));
+
+            OnWindowDrawFilteredRocketDesignsColumn();
+
+            GUILayout.EndVertical();
+            #endregion
+
+            #region right-column
+            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
+
+            OnWindowDrawNewLabelsColumn();
+
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+            #endregion
+            #endregion
 
             GUILayout.BeginHorizontal();
 
@@ -131,23 +154,116 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             GUI.DragWindow();
         }
 
+        private void OnWindowFilterLabelsColumn()
+        {
+            GUILayout.Label("Column 1");
+        }
+
+        private void OnWindowDrawFilteredRocketDesignsColumn()
+        {
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle);
+
+            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
+            {
+                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
+
+                GUIContent buttonContent = new GUIContent
+                {
+                    image = rocketDesign.ThumbnailImage,
+                    text = rocketDesign.Name,
+                    tooltip = $"Select: {rocketDesign.Name}",
+                };
+
+                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle, GUILayout.ExpandWidth(true)))
+                {
+                    HandleExistingRocketdesignButtonClick(i, rocketDesign);
+                }
+            }
+
+            GUILayout.EndScrollView();
+        }
+
+        private void OnWindowDrawNewLabelsColumn()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
+
+            if (_newRocketDesign.Labels.Count == 0)
+            {
+                GUILayout.Label("No labels");
+            }
+            else
+            {
+                newRocketDesignNewLabelsScrollPosition = GUILayout.BeginScrollView(newRocketDesignNewLabelsScrollPosition, newRocketDesignNewLabelsScrollViewStyle);
+
+                foreach (var labelName in _newRocketDesign.Labels)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    if (GUILayout.Button("x", newRocketDesignNewLabelRemoveButtonStyle))
+                    {
+                        // TODO
+                        _newRocketDesign.Labels = _newRocketDesign.Labels.Where(label => label != labelName).ToList();
+                    }
+
+                    GUILayout.Label(labelName);
+
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.EndScrollView();
+            }
+
+            GUILayout.EndVertical();
+
+            GUILayout.Label("Attach new label:");
+            GUILayout.BeginHorizontal();
+            newRocketDesignNewLabelInputText = GUILayout.TextField(newRocketDesignNewLabelInputText, newRocketDesignNewLabelTextFieldStyle);
+
+            if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
+            {
+                // TODO
+                _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
+
+                newRocketDesignNewLabelInputText = "";
+            }
+            GUILayout.EndHorizontal();
+        }
+
+
         private void InitStyle()
         {
             rocketDesignSaverWindowStyle = new GUIStyle(HighLogic.Skin.window)
             {
-                fixedWidth = 300,
+                fixedWidth = 600,
                 stretchHeight = true
             };
 
             filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField);
 
-            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView)
+            {
+                stretchWidth = true,
+            };
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
                 fixedHeight = 100,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true
+            };
+
+            newRocketDesignNewLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            newRocketDesignNewLabelRemoveButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                fixedWidth = 20,
+            };
+            newRocketDesignNewLabelTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
+            {
+                fixedWidth = 150,
+            };
+            newRocketDesignNewLabelAddButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                stretchWidth = true,
             };
 
             saveOrReplaceButtonStyle = new GUIStyle(HighLogic.Skin.button);

@@ -6,14 +6,14 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverController
     {
-        private readonly IConfigNodeAdapter _newConfigNode;
+        private readonly RocketDesign _newRocketDesign;
         private readonly RocketDesignSaverUI _ui;
         private readonly RocketDesignManager _rocketDesignManager;
         public event Action OnComplete;
 
-        public RocketDesignSaverController(IConfigNodeAdapter newConfigNode, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
+        public RocketDesignSaverController(RocketDesign newRocketDesign, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
         {
-            _newConfigNode = newConfigNode;
+            _newRocketDesign = newRocketDesign;
 
             _ui = ui;
             _rocketDesignManager = rocketDesignManager;
@@ -40,12 +40,9 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void HandleSaveButtonClicked(string name)
         {
-            RocketDesign newRocketDesign = new RocketDesign(_newConfigNode)
-            {
-                Name = name
-            };
+            _newRocketDesign.Name = name;
 
-            _rocketDesignManager.SaveOrReplaceAsRocketDesign(newRocketDesign);
+            _rocketDesignManager.SaveOrReplaceAsRocketDesign(_newRocketDesign);
 
             MonoBehaviour.Destroy(_ui.gameObject);
 
