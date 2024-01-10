@@ -15,6 +15,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private RocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
         private bool saveButtonAsReplaceButton;
+        private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities"};
 
         private int _windowId;
         private string filterTextInputText = "";
@@ -22,6 +23,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private Vector2 filteredRocketDesignScrollPosition;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
         private string newRocketDesignNewLabelInputText = "";
+        private int _newRocketDesignToolbarSelection = 0;
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
@@ -33,6 +35,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newRocketDesignNewLabelRemoveButtonStyle;
         private GUIStyle newRocketDesignNewLabelTextFieldStyle;
         private GUIStyle newRocketDesignNewLabelAddButtonStyle;
+        private GUIStyle _newRocketDesignToolbarStyle;
 
         public void Init(RocketDesign newRocketDesign)
         {
@@ -180,9 +183,44 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
+            _newRocketDesignToolbarSelection = GUILayout.Toolbar(_newRocketDesignToolbarSelection, _newRocketDesignToolbarOptions, _newRocketDesignToolbarStyle);
+            if (_newRocketDesignToolbarSelection == 0)
+            {
+                OnWindowDrawNewLabelBlock();
+            }
+            else
+            {
+                OnWindowDrawNewCapabilityBlock();
+            }
+
+            GUILayout.EndVertical();
+
+
+            
+        }
+
+        private void OnWindowDrawNewLabelBlock()
+        {
+            GUILayout.Label("Add new label:");
+            GUILayout.BeginHorizontal();
+            newRocketDesignNewLabelInputText = GUILayout.TextField(newRocketDesignNewLabelInputText, newRocketDesignNewLabelTextFieldStyle);
+
+            GUI.enabled = newRocketDesignNewLabelInputText.Length != 0;
+            if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
+            {
+                // TODO
+                _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
+
+                newRocketDesignNewLabelInputText = "";
+            }
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            // TODO Search "global" or "found" Labels -box.
+
             if (_newRocketDesign.Labels.Count == 0)
             {
-                GUILayout.Label("No labels");
+                GUILayout.Label("No assigned labels");
             }
             else
             {
@@ -205,25 +243,26 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
                 GUILayout.EndScrollView();
             }
+        }
 
-            GUILayout.EndVertical();
-
-            GUILayout.Label("Attach new label:");
+        private void OnWindowDrawNewCapabilityBlock()
+        {
+            GUILayout.Label("Add new Capability:");
             GUILayout.BeginHorizontal();
-            newRocketDesignNewLabelInputText = GUILayout.TextField(newRocketDesignNewLabelInputText, newRocketDesignNewLabelTextFieldStyle);
+            newRocketDesignNewCapabilityInputText = GUILayout.TextField(newRocketDesignNewCapabilityInputText, newRocketDesignNewCapabilityTextFieldStyle);
 
-            GUI.enabled = newRocketDesignNewLabelInputText.Length != 0;
+            GUI.enabled = newRocketDesignNewCapabilityInputText.Length != 0;
             if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
             {
                 // TODO
                 _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
 
-                newRocketDesignNewLabelInputText = "";
+                newRocketDesignNewCapabilityInputText = "";
             }
-
             GUI.enabled = true;
-
             GUILayout.EndHorizontal();
+
+            // TODO Search "global" or "found" Labels -box.
         }
 
 
@@ -262,6 +301,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             {
                 stretchWidth = true,
             };
+            _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
 
             saveOrReplaceButtonStyle = new GUIStyle(HighLogic.Skin.button);
             saveOrReplaceButtonStyle.fixedWidth = 100;
