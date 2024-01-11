@@ -14,7 +14,6 @@ namespace BetterRocketDesigns
         void SetValue(string key, IReadOnlyList<string> value);
         void SetValue(string key, IReadOnlyDictionary<string, float> value);
 
-        void SetNode(string name, ConfigNode newNode);
         void AddValue(string key, string value);
     }
 }

@@ -52,11 +52,6 @@ namespace BetterRocketDesigns.ksp
             values = configNode.GetValuesList(name);
         }
 
-        public void SetNode(string name, ConfigNode newNode)
-        {
-            configNode.SetNode(name, newNode);
-        }
-
         public void SetValue(string key, IReadOnlyList<string> values)
         {
             configNode.RemoveValue(key);
