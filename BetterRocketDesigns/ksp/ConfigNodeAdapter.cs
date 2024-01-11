@@ -59,7 +59,7 @@ namespace BetterRocketDesigns.ksp
 
         public void SetValue(string key, IReadOnlyList<string> values)
         {
-            configNode.RemoveValue("key");
+            configNode.RemoveValue(key);
 
             foreach (string value in values)
             {

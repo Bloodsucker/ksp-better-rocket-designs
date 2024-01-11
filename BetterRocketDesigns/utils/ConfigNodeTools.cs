@@ -19,8 +19,8 @@ namespace BetterRocketDesigns.utils
                 dicConfigNodeValues.AddValue(kvp.Key, kvp.Value);
             }
 
-            dicConfigNode.SetNode("kvp", dicConfigNodeValues);
-            configNode.SetNode(name, dicConfigNode);
+            dicConfigNode.SetNode("kvp", dicConfigNodeValues, true);
+            configNode.SetNode(name, dicConfigNode, true);
         }
 
         public static void Load(ConfigNode configNode, string name, out Dictionary<string, float> value)

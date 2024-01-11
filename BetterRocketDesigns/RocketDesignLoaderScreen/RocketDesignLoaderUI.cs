@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BetterRocketDesigns.RocketDesignLoaderScreen
@@ -87,27 +88,17 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
                 string buttonText = $"<b>{rocketDesign.Name}</b>";
 
-                string labelsButtonText = "";
-
-                foreach(var label in rocketDesign.Labels)
-                {
-                    labelsButtonText += $"{label} - ";
-                }
-
                 if (rocketDesign.Labels.Count > 0)
                 {
+                    string labelsButtonText = string.Join(" - ", rocketDesign.Labels);
+
                     buttonText += $"\n{labelsButtonText}";
-                }
-
-                string capabilitiesButtonText = "";
-
-                foreach (var kvp in rocketDesign.Capabilities)
-                {
-                    capabilitiesButtonText += $"{kvp.Key}: {kvp.Value}; ";
                 }
 
                 if (rocketDesign.Capabilities.Count > 0)
                 {
+                    string capabilitiesButtonText = string.Join("; ", rocketDesign.Capabilities.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+
                     buttonText += $"\nCap: {capabilitiesButtonText}";
                 }
 
@@ -163,7 +154,9 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
                 stretchWidth = true,
                 fixedHeight = 100,
                 alignment = TextAnchor.MiddleLeft,
-                richText = true
+                richText = true,
+                wordWrap = true,
+                fontStyle = FontStyle.Normal,
             };
 
             loadButtonStyle = new GUIStyle(HighLogic.Skin.button);
