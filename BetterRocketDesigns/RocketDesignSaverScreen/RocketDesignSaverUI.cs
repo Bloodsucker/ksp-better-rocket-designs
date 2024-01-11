@@ -19,11 +19,13 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private int _windowId;
         private string filterTextInputText = "";
-        private Rect _windowPosition;
+        private Rect _windowPosition = new Rect(0, 0, 600, 300);
         private Vector2 filteredRocketDesignScrollPosition;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
         private string newRocketDesignNewLabelInputText = "";
         private int _newRocketDesignToolbarSelection = 0;
+        private string newRocketDesignNewCapabilityNameInputText = "";
+        private string newRocketDesignNewCapabilityValueInputText = "";
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
@@ -36,6 +38,10 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newRocketDesignNewLabelTextFieldStyle;
         private GUIStyle newRocketDesignNewLabelAddButtonStyle;
         private GUIStyle _newRocketDesignToolbarStyle;
+        private GUIStyle newRocketDesignNewCapabilityNameTextFieldStyle;
+        private GUIStyle newRocketDesignNewCapabilityValueTextFieldStyle;
+        private GUIStyle newRocketDesignNewCapabilityAddButtonStyle;
+        private GUIStyle newRocketDesignNewLabelNameLabelStyle;
 
         public void Init(RocketDesign newRocketDesign)
         {
@@ -45,7 +51,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private void Start()
         {
             _windowId = GetInstanceID();
-            _windowPosition = new Rect();
+            _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
+            _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
             saveButtonAsReplaceButton = false;
 
             InitStyle();
@@ -127,19 +134,17 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             GUILayout.BeginHorizontal();
 
             #region left-column
-            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
+            GUILayout.BeginVertical(GUILayout.Width(200));
             OnWindowFilterLabelsColumn();
             GUILayout.EndVertical();
             #endregion
 
             #region middle-column
-            GUILayout.BeginVertical(GUILayout.Height(300f), GUILayout.Width(_windowPosition.width / 3));
             OnWindowDrawFilteredRocketDesignsColumn();
-            GUILayout.EndVertical();
             #endregion
 
             #region right-column
-            GUILayout.BeginVertical(GUILayout.Width(_windowPosition.width / 3));
+            GUILayout.BeginVertical(GUILayout.Width(200));
             OnWindowDrawNewLabelsColumn();
             GUILayout.EndVertical();
             #endregion
@@ -157,7 +162,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle);
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle, GUILayout.Width(200), GUILayout.Height(300));
 
             for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
             {
@@ -194,19 +199,16 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             }
 
             GUILayout.EndVertical();
-
-
-            
         }
 
         private void OnWindowDrawNewLabelBlock()
         {
-            GUILayout.Label("Add new label:");
+            GUILayout.Label("Add new Label:");
             GUILayout.BeginHorizontal();
             newRocketDesignNewLabelInputText = GUILayout.TextField(newRocketDesignNewLabelInputText, newRocketDesignNewLabelTextFieldStyle);
 
             GUI.enabled = newRocketDesignNewLabelInputText.Length != 0;
-            if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
+            if (GUILayout.Button("+", newRocketDesignNewLabelAddButtonStyle))
             {
                 // TODO
                 _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
@@ -230,13 +232,13 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 {
                     GUILayout.BeginHorizontal();
 
-                    if (GUILayout.Button("X", newRocketDesignNewLabelRemoveButtonStyle))
+                    if (GUILayout.Button("-", newRocketDesignNewLabelRemoveButtonStyle))
                     {
                         // TODO
                         _newRocketDesign.Labels = _newRocketDesign.Labels.Where(label => label != labelName).ToList();
                     }
 
-                    GUILayout.Label(labelName);
+                    GUILayout.Label(labelName, newRocketDesignNewLabelNameLabelStyle);
 
                     GUILayout.EndHorizontal();
                 }
@@ -247,17 +249,19 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowDrawNewCapabilityBlock()
         {
-            GUILayout.Label("Add new Capability:");
+            GUILayout.Label("Add new payload Capability:");
             GUILayout.BeginHorizontal();
-            newRocketDesignNewCapabilityInputText = GUILayout.TextField(newRocketDesignNewCapabilityInputText, newRocketDesignNewCapabilityTextFieldStyle);
+            newRocketDesignNewCapabilityNameInputText = GUILayout.TextField(newRocketDesignNewCapabilityNameInputText, newRocketDesignNewCapabilityNameTextFieldStyle, GUILayout.ExpandWidth(true));
+            newRocketDesignNewCapabilityValueInputText = GUILayout.TextField(newRocketDesignNewCapabilityValueInputText, newRocketDesignNewCapabilityValueTextFieldStyle, GUILayout.ExpandWidth(true));
+            GUILayout.Label("t", GUILayout.ExpandWidth(false));
 
-            GUI.enabled = newRocketDesignNewCapabilityInputText.Length != 0;
-            if (GUILayout.Button("Add", newRocketDesignNewLabelAddButtonStyle))
+            GUI.enabled = newRocketDesignNewCapabilityNameInputText.Length != 0;
+            if (GUILayout.Button("+", newRocketDesignNewCapabilityAddButtonStyle))
             {
                 // TODO
                 _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
 
-                newRocketDesignNewCapabilityInputText = "";
+                newRocketDesignNewCapabilityNameInputText = "";
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
@@ -270,16 +274,26 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             rocketDesignSaverWindowStyle = new GUIStyle(HighLogic.Skin.window)
             {
-                fixedWidth = 600,
                 stretchHeight = true
             };
 
-            filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField);
-
-            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView)
+            filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField)
             {
-                stretchWidth = true,
+                fixedHeight = HighLogic.Skin.button.CalcHeight(new GUIContent(), 20),
+                alignment = TextAnchor.MiddleLeft,
             };
+
+            saveOrReplaceButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                fixedWidth = 100,
+            };
+            cancelButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                fixedWidth = 100,
+            };
+
+            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
@@ -288,25 +302,48 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 richText = true
             };
 
+            _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
+
             newRocketDesignNewLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
-            newRocketDesignNewLabelRemoveButtonStyle = new GUIStyle(HighLogic.Skin.button)
-            {
-                fixedWidth = 20,
-            };
+
             newRocketDesignNewLabelTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
             {
-                fixedWidth = 150,
+                stretchWidth = true,
+                fixedHeight = HighLogic.Skin.button.CalcHeight(new GUIContent(), 20),
+                alignment = TextAnchor.MiddleLeft,
             };
             newRocketDesignNewLabelAddButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
-                stretchWidth = true,
+                stretchWidth = false,
+                fixedWidth = 30
             };
-            _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
+            newRocketDesignNewLabelRemoveButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                stretchWidth = false,
+                fixedWidth = 30
+            };
+            newRocketDesignNewLabelNameLabelStyle = new GUIStyle(HighLogic.Skin.label)
+            {
+                stretchWidth = true
+            };
 
-            saveOrReplaceButtonStyle = new GUIStyle(HighLogic.Skin.button);
-            saveOrReplaceButtonStyle.fixedWidth = 100;
-            cancelButtonStyle = new GUIStyle(HighLogic.Skin.button);
-            cancelButtonStyle.fixedWidth = 100;
+            newRocketDesignNewCapabilityNameTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
+            {
+                stretchWidth = true,
+                fixedHeight = HighLogic.Skin.button.CalcHeight(new GUIContent(), 20),
+                alignment = TextAnchor.MiddleLeft,
+            };
+            newRocketDesignNewCapabilityValueTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
+            {
+                stretchWidth = true,
+                fixedHeight = HighLogic.Skin.button.CalcHeight(new GUIContent(), 20),
+                alignment = TextAnchor.MiddleLeft,
+            };
+            newRocketDesignNewCapabilityAddButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                stretchWidth = false,
+                fixedWidth = 30
+            };
         }
     }
 }
