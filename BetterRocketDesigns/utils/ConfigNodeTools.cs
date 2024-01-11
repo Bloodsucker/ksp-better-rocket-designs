@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace BetterRocketDesigns.utils
 {
@@ -11,41 +7,42 @@ namespace BetterRocketDesigns.utils
     {
         public static void Store(ConfigNode configNode, string name, IReadOnlyDictionary<string, float> value)
         {
-            ConfigNode dicConfigNode = new ConfigNode();
-            ConfigNode dicConfigNodeValues = new ConfigNode();
-            foreach (var kvp in value)
-            {
-                dicConfigNode.AddValue("keys", kvp.Key);
-                dicConfigNodeValues.AddValue(kvp.Key, kvp.Value);
-            }
+            string dicKeys = ConfigNode.WriteStringArray(value.Keys.ToArray());
+            string dicValues = ConfigNode.WriteStringArray(value.Values.Select(x => x.ToString()).ToArray());
 
-            dicConfigNode.SetNode("kvp", dicConfigNodeValues, true);
-            configNode.SetNode(name, dicConfigNode, true);
+            configNode.SetValue($"{name}_keys", dicKeys, true);
+            configNode.SetValue($"{name}_values", dicValues, true);
         }
 
-        public static void Load(ConfigNode configNode, string name, out Dictionary<string, float> value)
+        public static void Load(ConfigNode configNode, string name, out Dictionary<string, float> dictionary)
         {
-            value = new Dictionary<string, float>();
+            dictionary = new Dictionary<string, float>();
+            Dictionary<string, float>  tmpDictionary = new Dictionary<string, float>();
 
-            ConfigNode dicConfigNode = configNode.GetNode(name);
-            if (dicConfigNode == null)
+            if (!configNode.HasValue($"{name}_keys") || !configNode.HasValue($"{name}_values"))
             {
                 return;
             }
 
-            List<string> dicKeys = dicConfigNode.GetValuesList("keys");
-            ConfigNode kvpConfigNode = dicConfigNode.GetNode("kvp");
-            if(kvpConfigNode == null)
+            string[] keysArray = configNode.GetValue($"{name}_keys").Split(',');
+            string[] valuesArray = configNode.GetValue($"{name}_values").Split(',');
+
+            if (keysArray.Length != valuesArray.Length)
             {
-                Debug.Log("Incorrect serialized ConfigNode Dictionary structure (kvp)");
+                return;
             }
 
-            foreach(var dicKey in dicKeys)
+            for (int i = 0; i < keysArray.Length; i++)
             {
-                string valueStr = kvpConfigNode.GetValue(dicKey);
-                float dicValue = float.Parse(valueStr);
-                value.Add(dicKey, dicValue);
+                if (!float.TryParse(valuesArray[i], out float value))
+                {
+                    return;
+                }
+
+                tmpDictionary[keysArray[i]] = value;
             }
+
+            dictionary = tmpDictionary;
         }
     }
 }
