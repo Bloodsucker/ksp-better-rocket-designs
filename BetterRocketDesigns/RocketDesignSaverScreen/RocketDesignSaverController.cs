@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BetterRocketDesigns.RocketDesignSaverScreen
@@ -21,6 +22,10 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             _ui.OnFilterChanged += HandleFilterChanged;
             _ui.OnSaveButtonClicked += HandleSaveButtonClicked;
             _ui.OnCancelButtonClicked += HandleCancelClicked;
+            _ui.OnAddNewCapabilityButtonClicked += HandleNewCapabilityAddButtonClicked;
+            _ui.OnNewCapabilityRemoveButtonClicked += HandleNewCapabilityRemoveButtonClicked;
+            _ui.OnAddNewLabelButtonClicked += HandleNewLabelAddButtonClicked;
+            _ui.OnRemoveNewLabelButtonClicked += HandleNewLabelRemoveButtonClicked;
 
             _ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
         }
@@ -33,7 +38,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void HandleFilterChanged(string filterCriteria)
         {
-            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria );
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
 
             _ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
         }
@@ -47,6 +52,43 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             MonoBehaviour.Destroy(_ui.gameObject);
 
             OnComplete.Invoke();
+        }
+
+        private void HandleNewLabelAddButtonClicked(string labelName)
+        {
+            List<string> labels = _newRocketDesign.Labels.ToList();
+
+            if(labels.IndexOf(labelName) != -1)
+            {
+                return;
+            }
+
+            labels.Add(labelName);
+
+            _newRocketDesign.Labels = labels;
+        }
+
+        private void HandleNewLabelRemoveButtonClicked(string labelName)
+        {
+            List<string> labels = _newRocketDesign.Labels.ToList();
+            labels.Remove(labelName);
+
+            _newRocketDesign.Labels = labels;
+        }
+
+        private void HandleNewCapabilityAddButtonClicked(string newCapabilityName, float newCapabilityValue)
+        {
+            Dictionary<string, float> clonedCapabilities = new Dictionary<string, float>(_newRocketDesign.Capabilities
+                .ToDictionary(entry => entry.Key, entry => entry.Value));
+            clonedCapabilities.Add(newCapabilityName, newCapabilityValue);
+            _newRocketDesign.Capabilities = clonedCapabilities;
+        }
+        private void HandleNewCapabilityRemoveButtonClicked(string capabilityName)
+        {
+            Dictionary<string, float> clonedCapabilities = new Dictionary<string, float>(_newRocketDesign.Capabilities
+                .ToDictionary(entry => entry.Key, entry => entry.Value));
+            clonedCapabilities.Remove(capabilityName);
+            _newRocketDesign.Capabilities = clonedCapabilities;
         }
 
         public void Close()

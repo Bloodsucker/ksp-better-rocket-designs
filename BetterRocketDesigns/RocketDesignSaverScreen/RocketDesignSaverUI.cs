@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 namespace BetterRocketDesigns.RocketDesignSaverScreen
@@ -11,6 +10,10 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         public event Action<string> OnFilterChanged;
         public event Action<string> OnSaveButtonClicked;
         public event Action OnCancelButtonClicked;
+        public event Action<string, float> OnAddNewCapabilityButtonClicked;
+        public event Action<string> OnNewCapabilityRemoveButtonClicked;
+        public event Action<string> OnAddNewLabelButtonClicked;
+        public event Action<string> OnRemoveNewLabelButtonClicked;
 
         private RocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
@@ -26,6 +29,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private int _newRocketDesignToolbarSelection = 0;
         private string newRocketDesignNewCapabilityNameInputText = "";
         private string newRocketDesignNewCapabilityValueInputText = "";
+        private Vector2 newCapabilityScrollPosition;
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
@@ -42,6 +46,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newRocketDesignNewCapabilityValueTextFieldStyle;
         private GUIStyle newRocketDesignNewCapabilityAddButtonStyle;
         private GUIStyle newRocketDesignNewLabelNameLabelStyle;
+        private GUIStyle newCapabilityScrollViewStyle;
+        private GUIStyle newCapabilityRemoveButtonStyle;
 
         public void Init(RocketDesign newRocketDesign)
         {
@@ -210,8 +216,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             GUI.enabled = newRocketDesignNewLabelInputText.Length != 0;
             if (GUILayout.Button("+", newRocketDesignNewLabelAddButtonStyle))
             {
-                // TODO
-                _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
+                OnAddNewLabelButtonClicked.Invoke(newRocketDesignNewLabelInputText);
 
                 newRocketDesignNewLabelInputText = "";
             }
@@ -222,7 +227,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             if (_newRocketDesign.Labels.Count == 0)
             {
-                GUILayout.Label("No assigned labels");
+                GUILayout.Label("No assigned Labels");
             }
             else
             {
@@ -234,11 +239,10 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
                     if (GUILayout.Button("-", newRocketDesignNewLabelRemoveButtonStyle))
                     {
-                        // TODO
-                        _newRocketDesign.Labels = _newRocketDesign.Labels.Where(label => label != labelName).ToList();
+                        OnRemoveNewLabelButtonClicked.Invoke(labelName);
                     }
 
-                    GUILayout.Label(labelName, newRocketDesignNewLabelNameLabelStyle);
+                    GUILayout.Label(labelName);
 
                     GUILayout.EndHorizontal();
                 }
@@ -255,18 +259,45 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             newRocketDesignNewCapabilityValueInputText = GUILayout.TextField(newRocketDesignNewCapabilityValueInputText, newRocketDesignNewCapabilityValueTextFieldStyle, GUILayout.ExpandWidth(true));
             GUILayout.Label("t", GUILayout.ExpandWidth(false));
 
-            GUI.enabled = newRocketDesignNewCapabilityNameInputText.Length != 0;
-            if (GUILayout.Button("+", newRocketDesignNewCapabilityAddButtonStyle))
+            bool isNewCapabilityValueFloatParseSuccessful = float.TryParse(newRocketDesignNewCapabilityValueInputText, out float newCapabilityValue);
+
+            GUI.enabled = newRocketDesignNewCapabilityNameInputText.Length != 0 && isNewCapabilityValueFloatParseSuccessful;
+            if (GUILayout.Button("+", newRocketDesignNewCapabilityAddButtonStyle) && isNewCapabilityValueFloatParseSuccessful)
             {
-                // TODO
-                _newRocketDesign.Labels = _newRocketDesign.Labels.Concat(new[] { newRocketDesignNewLabelInputText }).ToList();
+                OnAddNewCapabilityButtonClicked.Invoke(newRocketDesignNewCapabilityNameInputText, newCapabilityValue);
 
                 newRocketDesignNewCapabilityNameInputText = "";
+                newRocketDesignNewCapabilityValueInputText = "";
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
-            // TODO Search "global" or "found" Labels -box.
+            // TODO Search "global" or "found" Capabilities -box.
+
+            if (_newRocketDesign.Capabilities.Count == 0)
+            {
+                GUILayout.Label("No assigned Capabilities");
+            }
+            else
+            {
+                newCapabilityScrollPosition = GUILayout.BeginScrollView(newCapabilityScrollPosition, newCapabilityScrollViewStyle);
+
+                foreach (var kvp in _newRocketDesign.Capabilities)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    if (GUILayout.Button("-", newCapabilityRemoveButtonStyle))
+                    {
+                        OnNewCapabilityRemoveButtonClicked.Invoke(kvp.Key);
+                    }
+
+                    GUILayout.Label($"{kvp.Key}: {kvp.Value} t");
+
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.EndScrollView();
+            }
         }
 
 
@@ -304,7 +335,6 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
 
-            newRocketDesignNewLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
 
             newRocketDesignNewLabelTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
             {
@@ -317,14 +347,11 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 stretchWidth = false,
                 fixedWidth = 30
             };
+            newRocketDesignNewLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
             newRocketDesignNewLabelRemoveButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = false,
                 fixedWidth = 30
-            };
-            newRocketDesignNewLabelNameLabelStyle = new GUIStyle(HighLogic.Skin.label)
-            {
-                stretchWidth = true
             };
 
             newRocketDesignNewCapabilityNameTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
@@ -340,6 +367,12 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 alignment = TextAnchor.MiddleLeft,
             };
             newRocketDesignNewCapabilityAddButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                stretchWidth = false,
+                fixedWidth = 30
+            };
+            newCapabilityScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            newCapabilityRemoveButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = false,
                 fixedWidth = 30
