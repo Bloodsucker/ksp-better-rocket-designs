@@ -16,11 +16,14 @@ namespace BetterRocketDesigns
         private ApplicationLauncherButton _rocketDesignLoaderToolbarButton;
         private Part detachedPart;
 
+        private bool _isRocketDesignSaverWindowOpen = false;
         private RocketDesignSaverController rocketDesignSaverController;
         private RocketDesignLoaderController _rocketDesignLoaderController;
 
         private void Start()
         {
+            _isRocketDesignSaverWindowOpen = false;
+
             string targetDirectory = System.IO.Path.Combine(KSPUtil.ApplicationRootPath, "saves", HighLogic.SaveFolder);
             RocketDesignLoader rocketDesignLoader = new RocketDesignLoader(targetDirectory);
             _rocketDesignManager = new RocketDesignManager(rocketDesignLoader);
@@ -39,6 +42,11 @@ namespace BetterRocketDesigns
 
         private void ShowSaveToolbarButton()
         {
+            if(_isRocketDesignSaverWindowOpen)
+            {
+                return;
+            }
+
             _rocketDesignSaverToolbarButton = ApplicationLauncher.Instance.AddModApplication(
                 OnRocketDesignSaverToolbarButtonIn,
                 OnRocketDesignSaverToolbarButtonOut,
@@ -85,6 +93,8 @@ namespace BetterRocketDesigns
                 return;
             };
 
+            _isRocketDesignSaverWindowOpen = true;
+
             ConfigNode cn = CraftTools.TransformAsConfigNode(detachedPart);
             ConfigNodeAdapter configNode = new ConfigNodeAdapter(cn);
             RocketDesign newRocketDesign = new RocketDesign(configNode);
@@ -98,6 +108,7 @@ namespace BetterRocketDesigns
 
             rocketDesignSaverController.OnComplete += delegate
             {
+                _isRocketDesignSaverWindowOpen = false;
                 _rocketDesignSaverToolbarButton?.SetFalse(true);
             };
         }

@@ -45,7 +45,6 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newRocketDesignNewCapabilityNameTextFieldStyle;
         private GUIStyle newRocketDesignNewCapabilityValueTextFieldStyle;
         private GUIStyle newRocketDesignNewCapabilityAddButtonStyle;
-        private GUIStyle newRocketDesignNewLabelNameLabelStyle;
         private GUIStyle newCapabilityScrollViewStyle;
         private GUIStyle newCapabilityRemoveButtonStyle;
 
