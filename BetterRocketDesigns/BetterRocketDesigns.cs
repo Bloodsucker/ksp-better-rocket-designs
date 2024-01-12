@@ -17,12 +17,14 @@ namespace BetterRocketDesigns
         private Part detachedPart;
 
         private bool _isRocketDesignSaverWindowOpen = false;
+        private bool _isRocketDesignLoaderWindowOpen = false;
         private RocketDesignSaverController rocketDesignSaverController;
         private RocketDesignLoaderController _rocketDesignLoaderController;
 
         private void Start()
         {
             _isRocketDesignSaverWindowOpen = false;
+            _isRocketDesignLoaderWindowOpen = false;
 
             string targetDirectory = System.IO.Path.Combine(KSPUtil.ApplicationRootPath, "saves", HighLogic.SaveFolder);
             RocketDesignLoader rocketDesignLoader = new RocketDesignLoader(targetDirectory);
@@ -42,7 +44,7 @@ namespace BetterRocketDesigns
 
         private void ShowSaveToolbarButton()
         {
-            if(_isRocketDesignSaverWindowOpen)
+            if(_isRocketDesignSaverWindowOpen || _isRocketDesignLoaderWindowOpen)
             {
                 return;
             }
@@ -67,6 +69,14 @@ namespace BetterRocketDesigns
 
         private void OnRocketDesignLoaderToolbarButtonIn()
         {
+            if(_isRocketDesignLoaderWindowOpen || _isRocketDesignSaverWindowOpen)
+            {
+                _rocketDesignLoaderToolbarButton?.SetFalse(true);
+                return;
+            }
+
+            _isRocketDesignLoaderWindowOpen = true;
+
             RocketDesignLoaderUI rocketDesignLoaderUI = new GameObject("RocketDesignLoaderUI")
                 .AddComponent<RocketDesignLoaderUI>();
 
@@ -74,6 +84,7 @@ namespace BetterRocketDesigns
 
             _rocketDesignLoaderController.OnComplete += delegate
             {
+                _isRocketDesignLoaderWindowOpen = false;
                 _rocketDesignLoaderToolbarButton?.SetFalse(true);
             };
         }
@@ -81,15 +92,16 @@ namespace BetterRocketDesigns
         private void OnRocketDesignLoaderToolbarButtonOut()
         {
             _rocketDesignLoaderController?.Close();
+            _isRocketDesignLoaderWindowOpen = false;
             _rocketDesignLoaderController = null;
         }
 
 
         private void OnRocketDesignSaverToolbarButtonIn()
         {
-            if (detachedPart == null)
+            if (detachedPart == null || _isRocketDesignSaverWindowOpen || _isRocketDesignLoaderWindowOpen)
             {
-                _rocketDesignSaverToolbarButton.SetFalse(true);
+                _rocketDesignSaverToolbarButton?.SetFalse(true);
                 return;
             };
 
@@ -116,6 +128,7 @@ namespace BetterRocketDesigns
         private void OnRocketDesignSaverToolbarButtonOut()
         {
             rocketDesignSaverController?.Close();
+            _isRocketDesignSaverWindowOpen = false;
             rocketDesignSaverController = null;
         }
 
