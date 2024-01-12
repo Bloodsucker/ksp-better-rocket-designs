@@ -17,7 +17,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
         private int _windowId;
         private string filterTextInputText;
-        private Rect _windowPosition;
+        private Rect _windowPosition = new Rect(0, 0, 300, 300);
         private Vector2 filteredRocketDesignScrollPosition;
 
         private GUIStyle rocketDesignSaverWindowStyle;
@@ -30,7 +30,8 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private void Start()
         {
             _windowId = GetInstanceID();
-            _windowPosition = new Rect();
+            _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
+            _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
 
             InitStyle();
         }
