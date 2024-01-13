@@ -43,6 +43,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
         private GUIStyle filteredRocketDesignScrollViewStyle;
+        private GUIStyle filteredRocketDesignHScrollViewStyle;
+        private GUIStyle filteredRocketDesignVScrollViewStyle;
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle saveOrReplaceButtonStyle;
         private GUIStyle cancelButtonStyle;
@@ -190,11 +192,12 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             {
                 _filterLabelsSelection.TryGetValue(filterLabel, out bool isSelected);
                 isSelected = GUILayout.Toggle(isSelected, filterLabel, _filterLabelSelectionToggleStyle);
-                _filterLabelsSelection.Remove(filterLabel);
-                _filterLabelsSelection.Add(filterLabel, isSelected);
 
                 if (GUI.changed)
                 {
+                    _filterLabelsSelection.Remove(filterLabel);
+                    _filterLabelsSelection.Add(filterLabel, isSelected);
+
                     OnFilterLabelToggled.Invoke(filterLabel, isSelected);
                 }
             }
@@ -209,11 +212,12 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             {
                 _filterCapabilitiesSelection.TryGetValue(filterCapability, out bool isSelected);
                 isSelected = GUILayout.Toggle(isSelected, filterCapability, _filterCapabilitySelectionToggleStyle);
-                _filterCapabilitiesSelection.Remove(filterCapability);
-                _filterCapabilitiesSelection.Add(filterCapability, isSelected);
 
                 if (GUI.changed)
                 {
+                    _filterCapabilitiesSelection.Remove(filterCapability);
+                    _filterCapabilitiesSelection.Add(filterCapability, isSelected);
+
                     OnFilterCapabilityToggled.Invoke(filterCapability, isSelected);
                 }
             }
@@ -223,7 +227,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle, GUILayout.Width(200), GUILayout.Height(300));
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200));
 
             for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
             {
@@ -236,7 +240,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                     tooltip = $"Select: {rocketDesign.Name}",
                 };
 
-                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle, GUILayout.ExpandWidth(true)))
+                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle))
                 {
                     HandleExistingRocketdesignButtonClick(i, rocketDesign);
                 }
@@ -383,13 +387,15 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             };
 
             filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            filteredRocketDesignHScrollViewStyle = new GUIStyle(HighLogic.Skin.horizontalScrollbar);
+            filteredRocketDesignVScrollViewStyle = new GUIStyle(HighLogic.Skin.verticalScrollbar);
 
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
                 fixedHeight = 100,
                 alignment = TextAnchor.MiddleLeft,
-                richText = true
+                richText = true,
             };
 
             _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
