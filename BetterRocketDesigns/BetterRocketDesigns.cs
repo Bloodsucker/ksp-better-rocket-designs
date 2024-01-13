@@ -114,7 +114,7 @@ namespace BetterRocketDesigns
             RocketDesignSaverUI rocketDesignSaverUI = new GameObject("RocketDesignSaverUI")
                  .AddComponent<RocketDesignSaverUI>();
 
-            rocketDesignSaverUI.Init(newRocketDesign);
+            rocketDesignSaverUI.Init(newRocketDesign, _rocketDesignManager.getCachedLabels(), _rocketDesignManager.getCachedCapabilities());
 
             rocketDesignSaverController = new RocketDesignSaverController(newRocketDesign, rocketDesignSaverUI, _rocketDesignManager);
 

@@ -12,6 +12,8 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private readonly RocketDesignManager _rocketDesignManager;
         public event Action OnComplete;
 
+        private RocketDesignFilter _rocketDesignFilter = new RocketDesignFilter();
+
         public RocketDesignSaverController(RocketDesign newRocketDesign, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
         {
             _newRocketDesign = newRocketDesign;
@@ -19,15 +21,51 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             _ui = ui;
             _rocketDesignManager = rocketDesignManager;
 
-            _ui.OnFilterChanged += HandleFilterChanged;
+            _ui.OnTextFilterChanged += HandleTextFilterChanged;
             _ui.OnSaveButtonClicked += HandleSaveButtonClicked;
             _ui.OnCancelButtonClicked += HandleCancelClicked;
+            _ui.OnFilterLabelToggled += HandleFilterLabelToggled;
+            _ui.OnFilterCapabilityToggled += HandleFilterCapabilityToggled;
             _ui.OnAddNewCapabilityButtonClicked += HandleNewCapabilityAddButtonClicked;
             _ui.OnNewCapabilityRemoveButtonClicked += HandleNewCapabilityRemoveButtonClicked;
             _ui.OnAddNewLabelButtonClicked += HandleNewLabelAddButtonClicked;
             _ui.OnRemoveNewLabelButtonClicked += HandleNewLabelRemoveButtonClicked;
 
-            _ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
+            _ui.UpdateFilter(rocketDesignManager.GetCachedRocketDesigns());
+        }
+
+        private void HandleFilterCapabilityToggled(string filterCapability, bool isSelected)
+        {
+            if (_rocketDesignFilter.FilterCapabilities.Contains(filterCapability))
+            {
+                _rocketDesignFilter.FilterCapabilities.Remove(filterCapability);
+            }
+
+            if (isSelected)
+            {
+                _rocketDesignFilter.FilterCapabilities.Add(filterCapability);
+            }
+
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilter(filteredRocketDesigns);
+        }
+
+        private void HandleFilterLabelToggled(string filterLabel, bool isSelected)
+        {
+            if (_rocketDesignFilter.FilterLabels.Contains(filterLabel))
+            {
+                _rocketDesignFilter.FilterLabels.Remove(filterLabel);
+            }
+
+            if (isSelected)
+            {
+                _rocketDesignFilter.FilterLabels.Add(filterLabel);
+            }
+
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilter(filteredRocketDesigns);
         }
 
         public void HandleCancelClicked()
@@ -36,11 +74,13 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             OnComplete.Invoke();
         }
 
-        private void HandleFilterChanged(string filterCriteria)
+        private void HandleTextFilterChanged(string filterCriteria)
         {
-            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
+            _rocketDesignFilter.TextFilter = filterCriteria;
 
-            _ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilter(filteredRocketDesigns);
         }
 
         private void HandleSaveButtonClicked(string name)

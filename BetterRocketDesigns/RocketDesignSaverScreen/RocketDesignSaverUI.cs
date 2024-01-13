@@ -7,22 +7,31 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverUI : MonoBehaviour
     {
-        public event Action<string> OnFilterChanged;
+        public event Action<string> OnTextFilterChanged;
         public event Action<string> OnSaveButtonClicked;
         public event Action OnCancelButtonClicked;
+        public event Action<string, bool> OnFilterLabelToggled;
+        public event Action<string, bool> OnFilterCapabilityToggled;
         public event Action<string, float> OnAddNewCapabilityButtonClicked;
         public event Action<string> OnNewCapabilityRemoveButtonClicked;
         public event Action<string> OnAddNewLabelButtonClicked;
         public event Action<string> OnRemoveNewLabelButtonClicked;
 
+
         private RocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
+        private IReadOnlyCollection<string> _cachedFilterLabels;
+        private IReadOnlyCollection<string> _cachedFilterCapabilities;
         private bool saveButtonAsReplaceButton;
         private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities"};
 
         private int _windowId;
-        private string filterTextInputText = "";
         private Rect _windowPosition = new Rect(0, 0, 600, 300);
+        private string filterTextInputText = "";
+        private Dictionary<string, bool> _filterLabelsSelection;
+        private Dictionary<string, bool> _filterCapabilitiesSelection;
+        private Vector2 filterLabelsScrollPosition;
+        private Vector2 filterCapabilitiesScrollPosition;
         private Vector2 filteredRocketDesignScrollPosition;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
         private string newRocketDesignNewLabelInputText = "";
@@ -37,6 +46,10 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle saveOrReplaceButtonStyle;
         private GUIStyle cancelButtonStyle;
+        private GUIStyle _filterLabelSelectionToggleStyle;
+        private GUIStyle filterLabelsScrollViewStyle;
+        private GUIStyle filterCapabilitiesScrollViewStyle;
+        private GUIStyle _filterCapabilitySelectionToggleStyle;
         private GUIStyle newRocketDesignNewLabelsScrollViewStyle;
         private GUIStyle newRocketDesignNewLabelRemoveButtonStyle;
         private GUIStyle newRocketDesignNewLabelTextFieldStyle;
@@ -48,9 +61,23 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newCapabilityScrollViewStyle;
         private GUIStyle newCapabilityRemoveButtonStyle;
 
-        public void Init(RocketDesign newRocketDesign)
+        public void Init(RocketDesign newRocketDesign, IReadOnlyCollection<string> cachedLabels, IReadOnlyCollection<string> cachedCapabilities)
         {
             _newRocketDesign = newRocketDesign;
+            _cachedFilterLabels = cachedLabels;
+            _cachedFilterCapabilities = cachedCapabilities;
+
+            _filterLabelsSelection = new Dictionary<string, bool>();
+            foreach(var label in _cachedFilterLabels)
+            {
+                _filterLabelsSelection.Add(label, false);
+            }
+
+            _filterCapabilitiesSelection = new Dictionary<string, bool>();
+            foreach(var capabilities in _cachedFilterCapabilities)
+            {
+                _filterCapabilitiesSelection.Add(capabilities, false);
+            }
         }
 
         private void Start()
@@ -63,25 +90,18 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             InitStyle();
         }
 
-        public void UpdateFilteredRocketDesigns(List<RocketDesign> rocketDesigns)
+        public void UpdateFilter(List<RocketDesign> rocketDesigns)
         {
-            this.filteredRocketDesigns = rocketDesigns;
+            filteredRocketDesigns = rocketDesigns;
+
+            saveButtonAsReplaceButton = filteredRocketDesigns.Any(rocketDesign => rocketDesign.Name == filterTextInputText);
         }
 
         private void HandleFilterTextInputChange(string newFilterText)
         {
             saveButtonAsReplaceButton = false;
 
-            foreach (RocketDesign rocketDesign in this.filteredRocketDesigns)
-            {
-                if (rocketDesign.Name == newFilterText)
-                {
-                    saveButtonAsReplaceButton = true;
-                    break;
-                }
-            }
-
-            OnFilterChanged.Invoke(newFilterText);
+            OnTextFilterChanged.Invoke(newFilterText);
         }
 
         private void HandleSaveButtonClick()
@@ -135,11 +155,11 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             GUILayout.EndHorizontal();
             #endregion
 
-            #region middle-section
+            #region body-section
             GUILayout.BeginHorizontal();
 
             #region left-column
-            GUILayout.BeginVertical(GUILayout.Width(200));
+            GUILayout.BeginVertical();
             OnWindowFilterLabelsColumn();
             GUILayout.EndVertical();
             #endregion
@@ -162,7 +182,43 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowFilterLabelsColumn()
         {
-            GUILayout.Label("Column 1");
+            GUILayout.Label("Label filter (OR)");
+
+            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach(var filterLabel in _cachedFilterLabels)
+            {
+                _filterLabelsSelection.TryGetValue(filterLabel, out bool isSelected);
+                isSelected = GUILayout.Toggle(isSelected, filterLabel, _filterLabelSelectionToggleStyle);
+                _filterLabelsSelection.Remove(filterLabel);
+                _filterLabelsSelection.Add(filterLabel, isSelected);
+
+                if (GUI.changed)
+                {
+                    OnFilterLabelToggled.Invoke(filterLabel, isSelected);
+                }
+            }
+
+            GUILayout.EndScrollView();
+
+            GUILayout.Label("Capability filter (OR)");
+
+            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach(var filterCapability in _cachedFilterCapabilities)
+            {
+                _filterCapabilitiesSelection.TryGetValue(filterCapability, out bool isSelected);
+                isSelected = GUILayout.Toggle(isSelected, filterCapability, _filterCapabilitySelectionToggleStyle);
+                _filterCapabilitiesSelection.Remove(filterCapability);
+                _filterCapabilitiesSelection.Add(filterCapability, isSelected);
+
+                if (GUI.changed)
+                {
+                    OnFilterCapabilityToggled.Invoke(filterCapability, isSelected);
+                }
+            }
+
+            GUILayout.EndScrollView();
         }
 
         private void OnWindowDrawFilteredRocketDesignsColumn()
@@ -299,13 +355,17 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             }
         }
 
-
         private void InitStyle()
         {
             rocketDesignSaverWindowStyle = new GUIStyle(HighLogic.Skin.window)
             {
                 stretchHeight = true
             };
+
+            filterLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            _filterLabelSelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
+            filterCapabilitiesScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            _filterCapabilitySelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
 
             filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField)
             {
@@ -333,7 +393,6 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             };
 
             _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
-
 
             newRocketDesignNewLabelTextFieldStyle = new GUIStyle(HighLogic.Skin.textField)
             {

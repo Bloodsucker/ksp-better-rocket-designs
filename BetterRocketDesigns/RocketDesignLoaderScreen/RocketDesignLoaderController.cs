@@ -49,9 +49,9 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
         private void HandleFilterChanged(string filterCriteria)
         {
-            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
+            //List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
 
-            this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+            //this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
         }
 
         public void Close()
