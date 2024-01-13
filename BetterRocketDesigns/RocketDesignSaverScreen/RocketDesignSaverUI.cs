@@ -12,6 +12,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         public event Action OnCancelButtonClicked;
         public event Action<string, bool> OnFilterLabelToggled;
         public event Action<string, bool> OnFilterCapabilityToggled;
+        public event Action<RocketDesign> OnFilteredRocketDesignButtonClick;
         public event Action<string, float> OnAddNewCapabilityButtonClicked;
         public event Action<string> OnNewCapabilityRemoveButtonClicked;
         public event Action<string> OnAddNewLabelButtonClicked;
@@ -100,6 +101,9 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             fileteredRocketDesignsContentGrid = new List<GUIContent>();
 
+            saveButtonAsReplaceButton = false;
+            filteredRocketDesignsSelectedGrid = -1;
+
             for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
             {
                 RocketDesign rocketDesign = this.filteredRocketDesigns[i];
@@ -136,8 +140,11 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
                 fileteredRocketDesignsContentGrid.Add(buttonContent);
 
-                saveButtonAsReplaceButton = rocketDesign.Name == filterTextInputText;
-                filteredRocketDesignsSelectedGrid = saveButtonAsReplaceButton ? i : -1;
+                if (!saveButtonAsReplaceButton)
+                {
+                    saveButtonAsReplaceButton = rocketDesign.Name == filterTextInputText;
+                    filteredRocketDesignsSelectedGrid = saveButtonAsReplaceButton ? i : -1;
+                }
             }
         }
 
@@ -158,12 +165,9 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             OnCancelButtonClicked.Invoke();
         }
 
-        private void HandleExistingRocketdesignButtonClick(int index, RocketDesign rocketDesign)
+        private void HandleExistingRocketdesignButtonClick(RocketDesign rocketDesign)
         {
-            filterTextInputText = rocketDesign.Name;
-            saveButtonAsReplaceButton = true;
-
-            HandleFilterTextInputChange(filterTextInputText);
+            OnFilteredRocketDesignButtonClick.Invoke(rocketDesign);
         }
 
         private void OnGUI()
@@ -209,7 +213,9 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             #endregion
 
             #region middle-column
+            GUILayout.BeginVertical();
             OnWindowDrawFilteredRocketDesignsColumn();
+            GUILayout.EndVertical();
             #endregion
 
             #region right-column
@@ -269,13 +275,14 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
+            GUILayout.Label("Copy all Metadata from:");
             filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200), GUILayout.MaxWidth(200));
 
             int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
             if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
             {
                 filteredRocketDesignsSelectedGrid = newFilteredRocketDesignsSelectedGrid;
-                HandleExistingRocketdesignButtonClick(filteredRocketDesignsSelectedGrid, filteredRocketDesigns[filteredRocketDesignsSelectedGrid]);
+                HandleExistingRocketdesignButtonClick(filteredRocketDesigns[filteredRocketDesignsSelectedGrid]);
             }
 
             GUILayout.EndScrollView();
@@ -425,7 +432,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
-                fixedHeight = 100,
+                fixedHeight = 70,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
                 fontStyle = FontStyle.Normal,

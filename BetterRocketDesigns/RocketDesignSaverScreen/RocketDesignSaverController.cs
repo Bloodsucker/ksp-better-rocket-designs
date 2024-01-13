@@ -26,12 +26,19 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             _ui.OnCancelButtonClicked += HandleCancelClicked;
             _ui.OnFilterLabelToggled += HandleFilterLabelToggled;
             _ui.OnFilterCapabilityToggled += HandleFilterCapabilityToggled;
+            _ui.OnFilteredRocketDesignButtonClick += HandleFilteredRocketDesignButtonClicked;
             _ui.OnAddNewCapabilityButtonClicked += HandleNewCapabilityAddButtonClicked;
             _ui.OnNewCapabilityRemoveButtonClicked += HandleNewCapabilityRemoveButtonClicked;
             _ui.OnAddNewLabelButtonClicked += HandleNewLabelAddButtonClicked;
             _ui.OnRemoveNewLabelButtonClicked += HandleNewLabelRemoveButtonClicked;
 
             _ui.UpdateFilter(rocketDesignManager.GetCachedRocketDesigns());
+        }
+
+        private void HandleFilteredRocketDesignButtonClicked(RocketDesign selectedRocketDesign)
+        {
+            _newRocketDesign.Labels = selectedRocketDesign.Labels;
+            _newRocketDesign.Capabilities = selectedRocketDesign.Capabilities;
         }
 
         private void HandleFilterCapabilityToggled(string filterCapability, bool isSelected)
