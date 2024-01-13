@@ -104,10 +104,33 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             {
                 RocketDesign rocketDesign = this.filteredRocketDesigns[i];
 
+                string buttonText = $"<b>{rocketDesign.Name}</b>";
+
+                if (rocketDesign.Labels.Count > 0)
+                {
+                    string labelsButtonText = string.Join(" - ", rocketDesign.Labels);
+                    
+                    string newLabelsButtonText = labelsButtonText.Substring(0, Math.Min(29, labelsButtonText.Length));
+                    if (newLabelsButtonText.Length != labelsButtonText.Length) newLabelsButtonText += "…";
+                    labelsButtonText = newLabelsButtonText;
+
+                    buttonText += $"\n{labelsButtonText}";
+                }
+
+                if (rocketDesign.Capabilities.Count > 0)
+                {
+                    string capabilitiesButtonText = string.Join("; ", rocketDesign.Capabilities.Select(kvp => $"{kvp.Key}: {kvp.Value} t"));
+                    
+                    string newCapabilitiesButtonText = capabilitiesButtonText.Substring(0, Math.Min(26, capabilitiesButtonText.Length));
+                    if (newCapabilitiesButtonText.Length != capabilitiesButtonText.Length) newCapabilitiesButtonText += "…";
+                    capabilitiesButtonText = newCapabilitiesButtonText;
+
+                    buttonText += $"\nCap: {capabilitiesButtonText}";
+                }
+
                 GUIContent buttonContent = new GUIContent
                 {
-                    image = rocketDesign.ThumbnailImage,
-                    text = rocketDesign.Name,
+                    text = buttonText,
                     tooltip = $"Select: {rocketDesign.Name}",
                 };
 
@@ -246,7 +269,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200));
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200), GUILayout.MaxWidth(200));
 
             int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
             if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
@@ -405,6 +428,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 fixedHeight = 100,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
+                fontStyle = FontStyle.Normal,
             };
 
             _newRocketDesignToolbarStyle = new GUIStyle(HighLogic.Skin.button);
