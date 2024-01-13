@@ -23,6 +23,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private IReadOnlyCollection<string> _cachedFilterLabels;
         private IReadOnlyCollection<string> _cachedFilterCapabilities;
         private bool saveButtonAsReplaceButton;
+        private List<GUIContent> fileteredRocketDesignsContentGrid = new List<GUIContent>();
         private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities"};
 
         private int _windowId;
@@ -33,6 +34,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private Vector2 filterLabelsScrollPosition;
         private Vector2 filterCapabilitiesScrollPosition;
         private Vector2 filteredRocketDesignScrollPosition;
+        private int filteredRocketDesignsSelectedGrid = -1;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
         private string newRocketDesignNewLabelInputText = "";
         private int _newRocketDesignToolbarSelection = 0;
@@ -96,7 +98,24 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             filteredRocketDesigns = rocketDesigns;
 
-            saveButtonAsReplaceButton = filteredRocketDesigns.Any(rocketDesign => rocketDesign.Name == filterTextInputText);
+            fileteredRocketDesignsContentGrid = new List<GUIContent>();
+
+            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
+            {
+                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
+
+                GUIContent buttonContent = new GUIContent
+                {
+                    image = rocketDesign.ThumbnailImage,
+                    text = rocketDesign.Name,
+                    tooltip = $"Select: {rocketDesign.Name}",
+                };
+
+                fileteredRocketDesignsContentGrid.Add(buttonContent);
+
+                saveButtonAsReplaceButton = rocketDesign.Name == filterTextInputText;
+                filteredRocketDesignsSelectedGrid = saveButtonAsReplaceButton ? i : -1;
+            }
         }
 
         private void HandleFilterTextInputChange(string newFilterText)
@@ -229,21 +248,11 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200));
 
-            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
+            int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
+            if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
             {
-                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
-
-                GUIContent buttonContent = new GUIContent
-                {
-                    image = rocketDesign.ThumbnailImage,
-                    text = rocketDesign.Name,
-                    tooltip = $"Select: {rocketDesign.Name}",
-                };
-
-                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle))
-                {
-                    HandleExistingRocketdesignButtonClick(i, rocketDesign);
-                }
+                filteredRocketDesignsSelectedGrid = newFilteredRocketDesignsSelectedGrid;
+                HandleExistingRocketdesignButtonClick(filteredRocketDesignsSelectedGrid, filteredRocketDesigns[filteredRocketDesignsSelectedGrid]);
             }
 
             GUILayout.EndScrollView();
