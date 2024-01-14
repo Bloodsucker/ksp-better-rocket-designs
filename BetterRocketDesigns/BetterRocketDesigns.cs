@@ -8,25 +8,31 @@ using BetterRocketDesigns.RocketDesignLoaderScreen;
 
 namespace BetterRocketDesigns
 {
+    enum ToolbarButtonMode
+    {
+        SAVE_AS,
+        LOAD,
+    }
+
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class BetterRocketDesigns : MonoBehaviour
     {
         private RocketDesignManager _rocketDesignManager;
-        private ApplicationLauncherButton _rocketDesignSaverToolbarButton;
-        private ApplicationLauncherButton _rocketDesignLoaderToolbarButton;
+        private ApplicationLauncherButton _toolbarButton;
         private Part detachedPart;
 
         private bool _isRocketDesignSaverWindowOpen = false;
         private bool _isRocketDesignLoaderWindowOpen = false;
         private RocketDesignSaverController rocketDesignSaverController;
         private RocketDesignLoaderController _rocketDesignLoaderController;
-        private Texture2D loadRocketDesignToolbarIcon;
-        private Texture2D saveAsRocketDesignToolbarIcon;
+        private Texture2D loadToolbarButtonIcon;
+        private Texture2D saveAsToolbarButtonIcon;
+        private ToolbarButtonMode _toolbarButtonMode;
 
         private void Start()
         {
-            loadRocketDesignToolbarIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/open-64p", false);
-            saveAsRocketDesignToolbarIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/save-as-64p", false);
+            loadToolbarButtonIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/open-64p", false);
+            saveAsToolbarButtonIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/save-as-64p", false);
 
             _isRocketDesignSaverWindowOpen = false;
             _isRocketDesignLoaderWindowOpen = false;
@@ -36,50 +42,34 @@ namespace BetterRocketDesigns
             _rocketDesignManager = new RocketDesignManager(rocketDesignLoader);
             _rocketDesignManager.LoadAllRocketDesigns();
 
-            _rocketDesignLoaderToolbarButton = ApplicationLauncher.Instance.AddModApplication(
-                OnRocketDesignLoaderToolbarButtonIn,
-                OnRocketDesignLoaderToolbarButtonOut,
+            _toolbarButton = ApplicationLauncher.Instance.AddModApplication(
+                OnToolbarButtonIn,
+                OnToolbarButtonOut,
                 DummyMethod, DummyMethod,
                 DummyMethod, DummyMethod,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
-                loadRocketDesignToolbarIcon);
+                loadToolbarButtonIcon);
 
             GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
+
+            SetToolbarButtonMode(ToolbarButtonMode.LOAD);
         }
 
-        private void ShowSaveToolbarButton()
+        private void SetToolbarButtonMode(ToolbarButtonMode toolbarButtonMode)
         {
-            if(_isRocketDesignSaverWindowOpen || _isRocketDesignLoaderWindowOpen)
+            if (toolbarButtonMode == ToolbarButtonMode.LOAD)
             {
-                return;
+                _toolbarButton.SetTexture(loadToolbarButtonIcon);
+            } else
+            {
+                _toolbarButton.SetTexture(saveAsToolbarButtonIcon);
             }
 
-            _rocketDesignSaverToolbarButton = ApplicationLauncher.Instance.AddModApplication(
-                OnRocketDesignSaverToolbarButtonIn,
-                OnRocketDesignSaverToolbarButtonOut,
-                DummyMethod, DummyMethod,
-                DummyMethod, DummyMethod,
-                ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
-                saveAsRocketDesignToolbarIcon);
+            _toolbarButtonMode = toolbarButtonMode;
         }
 
-        private void HideSaveToolbarButton()
+        private void OpenLoaderWindow()
         {
-            if(_rocketDesignSaverToolbarButton)
-            {
-                ApplicationLauncher.Instance.RemoveModApplication(_rocketDesignSaverToolbarButton);
-                _rocketDesignSaverToolbarButton = null;
-            }
-        }
-
-        private void OnRocketDesignLoaderToolbarButtonIn()
-        {
-            if(_isRocketDesignLoaderWindowOpen || _isRocketDesignSaverWindowOpen)
-            {
-                _rocketDesignLoaderToolbarButton?.SetFalse(true);
-                return;
-            }
-
             _isRocketDesignLoaderWindowOpen = true;
 
             RocketDesignLoaderUI rocketDesignLoaderUI = new GameObject("RocketDesignLoaderUI")
@@ -92,26 +82,12 @@ namespace BetterRocketDesigns
             _rocketDesignLoaderController.OnComplete += delegate
             {
                 _isRocketDesignLoaderWindowOpen = false;
-                _rocketDesignLoaderToolbarButton?.SetFalse(true);
+                _toolbarButton.SetFalse(true);
             };
         }
 
-        private void OnRocketDesignLoaderToolbarButtonOut()
+        private void OpenSaveAsWindow()
         {
-            _rocketDesignLoaderController?.Close();
-            _isRocketDesignLoaderWindowOpen = false;
-            _rocketDesignLoaderController = null;
-        }
-
-
-        private void OnRocketDesignSaverToolbarButtonIn()
-        {
-            if (detachedPart == null || _isRocketDesignSaverWindowOpen || _isRocketDesignLoaderWindowOpen)
-            {
-                _rocketDesignSaverToolbarButton?.SetFalse(true);
-                return;
-            };
-
             _isRocketDesignSaverWindowOpen = true;
 
             ConfigNode cn = CraftTools.TransformAsConfigNode(detachedPart);
@@ -128,46 +104,73 @@ namespace BetterRocketDesigns
             rocketDesignSaverController.OnComplete += delegate
             {
                 _isRocketDesignSaverWindowOpen = false;
-                _rocketDesignSaverToolbarButton?.SetFalse(true);
+                _toolbarButton.SetFalse(true);
             };
         }
 
-        private void OnRocketDesignSaverToolbarButtonOut()
+        private void OnToolbarButtonIn()
         {
+            if(_toolbarButtonMode == ToolbarButtonMode.LOAD)
+            {
+                OpenLoaderWindow();
+            }
+            else
+            {
+                OpenSaveAsWindow();
+            }
+        }
+
+        private void OnToolbarButtonOut()
+        {
+            _rocketDesignLoaderController?.Close();
+            _isRocketDesignLoaderWindowOpen = false;
+            _rocketDesignLoaderController = null;
+
             rocketDesignSaverController?.Close();
             _isRocketDesignSaverWindowOpen = false;
             rocketDesignSaverController = null;
+
+            if(detachedPart != null)
+            {
+                SetToolbarButtonMode(ToolbarButtonMode.SAVE_AS);
+            }
+            else
+            {
+                SetToolbarButtonMode(ToolbarButtonMode.LOAD);
+            }
         }
 
         private void OnDestroy()
         {
             GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
-
-            HideSaveToolbarButton();
-
-            ApplicationLauncher.Instance.RemoveModApplication(_rocketDesignLoaderToolbarButton);
+            ApplicationLauncher.Instance.RemoveModApplication(_toolbarButton);
         }
 
         private void OnEditorPartEvent(ConstructionEventType eventType, Part part)
         {
-            if (eventType != ConstructionEventType.PartDragging)
-                Debug.Log("OnEditorPartEvent: " + Enum.GetName(typeof(ConstructionEventType), eventType));
-
             switch (eventType)
             {
                 case ConstructionEventType.PartPicked:
                 case ConstructionEventType.PartDetached:
                 case ConstructionEventType.PartCopied:
-                    Debug.Log("Part dragged START: " + Enum.GetName(typeof(ConstructionEventType), eventType));
                     detachedPart = part;
-                    ShowSaveToolbarButton();
+
+                    if(!_isRocketDesignLoaderWindowOpen && !_isRocketDesignSaverWindowOpen)
+                    {
+                        SetToolbarButtonMode(ToolbarButtonMode.SAVE_AS);
+                    }
+
                     break;
                 case ConstructionEventType.PartDropped:
                 case ConstructionEventType.PartAttached:
                 case ConstructionEventType.PartDeleted:
-                    Debug.Log("Part dragged STOP: " + Enum.GetName(typeof(ConstructionEventType), eventType));
                     detachedPart = null;
-                    HideSaveToolbarButton();
+
+                    if(!_isRocketDesignSaverWindowOpen && !_isRocketDesignLoaderWindowOpen)
+                    {
+                        SetToolbarButtonMode(ToolbarButtonMode.LOAD);
+                    }
+
                     break;
             }
         }
