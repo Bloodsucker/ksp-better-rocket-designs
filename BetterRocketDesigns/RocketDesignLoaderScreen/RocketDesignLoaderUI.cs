@@ -9,58 +9,133 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
     {
         private RocketDesign _selectedRocketDesign;
 
-        public event Action<string> OnFilterChanged;
+        public event Action<string> OnTextFilterChanged;
+        public event Action<string, bool> OnFilterLabelToggled;
+        public event Action<string, bool> OnFilterCapabilityToggled;
         public event Action OnCancelButtonClicked;
         public event Action<RocketDesign> OnLoadButtonClicked;
 
         private List<RocketDesign> filteredRocketDesigns;
 
         private int _windowId;
+        private Rect _windowPosition = new Rect(0, 0, 600, 300);
         private string filterTextInputText;
-        private Rect _windowPosition = new Rect(0, 0, 300, 300);
+        private Dictionary<string, bool> _filterLabelsSelection;
+        private Dictionary<string, bool> _filterCapabilitiesSelection;
+        private IReadOnlyCollection<string> _cachedFilterLabels;
+        private IReadOnlyCollection<string> _cachedFilterCapabilities;
         private Vector2 filteredRocketDesignScrollPosition;
+        private Vector2 filterLabelsScrollPosition;
+        private Vector2 filterCapabilitiesScrollPosition;
+        private int filteredRocketDesignsSelectedGrid;
+        private List<GUIContent> fileteredRocketDesignsContentGrid;
+        private Vector2 _detailedLabelsScrollPosition;
+        private Vector2 _detailedCapabilitiesScrollPosition;
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
-        private GUIStyle filteredRocketDesignScrollViewStyle;
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle loadButtonStyle;
         private GUIStyle cancelButtonStyle;
+        private GUIStyle filteredRocketDesignHScrollViewStyle;
+        private GUIStyle filteredRocketDesignVScrollViewStyle;
+        private GUIStyle filterLabelsScrollViewStyle;
+        private GUIStyle filterCapabilitiesScrollViewStyle;
+        private GUIStyle _filterCapabilitySelectionToggleStyle;
+        private GUIStyle _filterLabelSelectionToggleStyle;
+        private GUIStyle _detailedLabelsHScrollViewStyle;
+        private GUIStyle _detailedLabelsVScrollViewStyle;
+        private GUIStyle _detailedCapabilitisHScrollViewStyle;
+        private GUIStyle _detailedCapabilitisVScrollViewStyle;
+        private GUIStyle _detailedLabelsScrollViewStyle;
+        private GUIStyle _detailedCapabilitisScrollViewStyle;
+
+        public void Init(IReadOnlyCollection<string> cachedLabels, IReadOnlyCollection<string> cachedCapabilities)
+        {
+            _cachedFilterLabels = cachedLabels;
+            _cachedFilterCapabilities = cachedCapabilities;
+
+            _filterLabelsSelection = new Dictionary<string, bool>();
+            foreach (var label in _cachedFilterLabels)
+            {
+                _filterLabelsSelection.Add(label, false);
+            }
+
+            _filterCapabilitiesSelection = new Dictionary<string, bool>();
+            foreach (var capabilities in _cachedFilterCapabilities)
+            {
+                _filterCapabilitiesSelection.Add(capabilities, false);
+            }
+        }
 
         private void Start()
         {
             _windowId = GetInstanceID();
+            _windowPosition = new Rect(0, 0, 650, 300);
             _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
             _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
+
+            filterTextInputText = "";
+            filteredRocketDesignsSelectedGrid = -1;
 
             InitStyle();
         }
 
-        public void UpdateFilteredRocketDesigns(List<RocketDesign> rocketDesigns)
+        public void UpdateFilterResults(List<RocketDesign> rocketDesigns)
         {
-            this.filteredRocketDesigns = rocketDesigns;
+            filteredRocketDesigns = rocketDesigns;
+
+            fileteredRocketDesignsContentGrid = new List<GUIContent>();
+
+            filteredRocketDesignsSelectedGrid = -1;
+            _selectedRocketDesign = null;
+
+            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
+            {
+                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
+
+                string buttonText = $"<b>{rocketDesign.Name}</b>";
+
+                if (rocketDesign.Labels.Count > 0)
+                {
+                    string labelsButtonText = string.Join(" - ", rocketDesign.Labels);
+
+                    string newLabelsButtonText = labelsButtonText.Substring(0, Math.Min(29, labelsButtonText.Length));
+                    if (newLabelsButtonText.Length != labelsButtonText.Length) newLabelsButtonText += "…";
+                    labelsButtonText = newLabelsButtonText;
+
+                    buttonText += $"\n{labelsButtonText}";
+                }
+
+                if (rocketDesign.Capabilities.Count > 0)
+                {
+                    string capabilitiesButtonText = string.Join("; ", rocketDesign.Capabilities.Select(kvp => $"{kvp.Key}: {kvp.Value} t"));
+
+                    string newCapabilitiesButtonText = capabilitiesButtonText.Substring(0, Math.Min(26, capabilitiesButtonText.Length));
+                    if (newCapabilitiesButtonText.Length != capabilitiesButtonText.Length) newCapabilitiesButtonText += "…";
+                    capabilitiesButtonText = newCapabilitiesButtonText;
+
+                    buttonText += $"\nCap: {capabilitiesButtonText}";
+                }
+
+                GUIContent buttonContent = new GUIContent
+                {
+                    text = buttonText,
+                    tooltip = $"Select: {rocketDesign.Name}",
+                };
+
+                fileteredRocketDesignsContentGrid.Add(buttonContent);
+            }
         }
 
         private void HandleFilterTextInputChange(string newFilterText)
         {
             _selectedRocketDesign = null;
 
-            OnFilterChanged.Invoke(newFilterText);
+            OnTextFilterChanged.Invoke(newFilterText);
         }
 
-        private void HandleLoadButtonClick()
-        {
-            if (_selectedRocketDesign == null) return;
-
-            OnLoadButtonClicked.Invoke(_selectedRocketDesign);
-        }
-
-        private void HandleCancelButtonClick()
-        {
-            OnCancelButtonClicked.Invoke();
-        }
-
-        private void HandleExistingRocketdesignButtonClick(int index, RocketDesign rocketDesign)
+        private void HandleExistingRocketdesignButtonClick(RocketDesign rocketDesign)
         {
             _selectedRocketDesign = rocketDesign;
         }
@@ -79,86 +154,167 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
                 HandleFilterTextInputChange(filterTextInputText);
             }
 
-            GUILayout.BeginVertical(GUILayout.Height(150f));
+            #region body-section
+            GUILayout.BeginHorizontal();
 
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle);
-
-            for (int i = 0; i < this.filteredRocketDesigns.Count; i++)
-            {
-                RocketDesign rocketDesign = this.filteredRocketDesigns[i];
-
-                string buttonText = $"<b>{rocketDesign.Name}</b>";
-
-                if (rocketDesign.Labels.Count > 0)
-                {
-                    string labelsButtonText = string.Join(" - ", rocketDesign.Labels);
-
-                    buttonText += $"\n{labelsButtonText}";
-                }
-
-                if (rocketDesign.Capabilities.Count > 0)
-                {
-                    string capabilitiesButtonText = string.Join("; ", rocketDesign.Capabilities.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
-
-                    buttonText += $"\nCap: {capabilitiesButtonText}";
-                }
-
-                GUIContent buttonContent = new GUIContent
-                {
-                    image = rocketDesign.ThumbnailImage,
-                    text = buttonText,
-                    tooltip = $"Load: {rocketDesign.Name}",
-                };
-
-                if (GUILayout.Button(buttonContent, filteredRocketDesignButtonStyle, GUILayout.ExpandWidth(true)))
-                {
-                    HandleExistingRocketdesignButtonClick(i, rocketDesign);
-                }
-            }
-
-            GUILayout.EndScrollView();
-
+            #region left-column
+            GUILayout.BeginVertical();
+            OnWindowFilterLabelsColumn();
             GUILayout.EndVertical();
+            #endregion
+
+            #region middle-column
+            GUILayout.BeginVertical();
+            OnWindowDrawFilteredRocketDesignsColumn();
+            GUILayout.EndVertical();
+            #endregion
+
+            #region right-column
+            GUILayout.BeginVertical(GUILayout.Width(200));
+            OnWindowRocketDesignDetailsColumn();
+            GUILayout.EndVertical();
+            #endregion
+
+            GUILayout.EndHorizontal();
+            #endregion
 
             GUILayout.BeginHorizontal();
 
             GUILayout.FlexibleSpace();
 
+            GUI.enabled = _selectedRocketDesign != null;
             if (GUILayout.Button("load", loadButtonStyle))
             {
-                HandleLoadButtonClick();
+                OnLoadButtonClicked.Invoke(_selectedRocketDesign);
             }
+            GUI.enabled = true;
 
             if (GUILayout.Button("Cancel", cancelButtonStyle))
             {
-                HandleCancelButtonClick();
+                OnCancelButtonClicked.Invoke();
             }
 
             GUILayout.EndHorizontal();
 
             GUI.DragWindow();
         }
+        private void OnWindowFilterLabelsColumn()
+        {
+            GUILayout.Label("Label filter (OR)");
+
+            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach (var filterLabel in _cachedFilterLabels)
+            {
+                _filterLabelsSelection.TryGetValue(filterLabel, out bool isSelected);
+                isSelected = GUILayout.Toggle(isSelected, filterLabel, _filterLabelSelectionToggleStyle);
+
+                if (GUI.changed)
+                {
+                    _filterLabelsSelection.Remove(filterLabel);
+                    _filterLabelsSelection.Add(filterLabel, isSelected);
+
+                    OnFilterLabelToggled.Invoke(filterLabel, isSelected);
+                }
+            }
+
+            GUILayout.EndScrollView();
+
+            GUILayout.Label("Capability filter (OR)");
+
+            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach (var filterCapability in _cachedFilterCapabilities)
+            {
+                _filterCapabilitiesSelection.TryGetValue(filterCapability, out bool isSelected);
+                isSelected = GUILayout.Toggle(isSelected, filterCapability, _filterCapabilitySelectionToggleStyle);
+
+                if (GUI.changed)
+                {
+                    _filterCapabilitiesSelection.Remove(filterCapability);
+                    _filterCapabilitiesSelection.Add(filterCapability, isSelected);
+
+                    OnFilterCapabilityToggled.Invoke(filterCapability, isSelected);
+                }
+            }
+
+            GUILayout.EndScrollView();
+        }
+
+        private void OnWindowDrawFilteredRocketDesignsColumn()
+        {
+            GUILayout.Label("Choose and Load:");
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(300), GUILayout.MaxWidth(300));
+
+            int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
+            if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
+            {
+                filteredRocketDesignsSelectedGrid = newFilteredRocketDesignsSelectedGrid;
+                HandleExistingRocketdesignButtonClick(filteredRocketDesigns[filteredRocketDesignsSelectedGrid]);
+            }
+
+            GUILayout.EndScrollView();
+        }
+
+        private void OnWindowRocketDesignDetailsColumn()
+        {
+            GUILayout.Label("Details");
+
+            if (_selectedRocketDesign == null) return;
+
+            GUILayout.Label("Name:");
+            GUILayout.Label(_selectedRocketDesign.Name);
+
+            GUILayout.Label("Labels:");
+            _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach(var label in _selectedRocketDesign.Labels)
+            {
+                GUILayout.Label(label);
+            }
+
+            GUILayout.EndScrollView();
+
+            GUILayout.Label("Capabilities:");
+            _detailedCapabilitiesScrollPosition = GUILayout.BeginScrollView(_detailedCapabilitiesScrollPosition, _detailedCapabilitisScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+
+            foreach (var capabilityKvp in _selectedRocketDesign.Capabilities)
+            {
+                GUILayout.Label(capabilityKvp.Key);
+            }
+
+            GUILayout.EndScrollView();
+        }
+
 
         private void InitStyle()
         {
             rocketDesignSaverWindowStyle = new GUIStyle(HighLogic.Skin.window)
             {
-                fixedWidth = 300,
                 stretchHeight = true
             };
 
             filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField);
 
-            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            filterLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            _filterLabelSelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
+            filterCapabilitiesScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            _filterCapabilitySelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
+
+            filteredRocketDesignHScrollViewStyle = new GUIStyle(HighLogic.Skin.horizontalScrollbar);
+            filteredRocketDesignVScrollViewStyle = new GUIStyle(HighLogic.Skin.verticalScrollbar);
+
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
-                fixedHeight = 100,
+                fixedHeight = 70,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
-                wordWrap = true,
                 fontStyle = FontStyle.Normal,
             };
+
+            _detailedLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            _detailedCapabilitisScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
 
             loadButtonStyle = new GUIStyle(HighLogic.Skin.button);
             loadButtonStyle.fixedWidth = 100;

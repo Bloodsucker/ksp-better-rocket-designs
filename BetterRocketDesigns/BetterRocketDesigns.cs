@@ -80,6 +80,8 @@ namespace BetterRocketDesigns
             RocketDesignLoaderUI rocketDesignLoaderUI = new GameObject("RocketDesignLoaderUI")
                 .AddComponent<RocketDesignLoaderUI>();
 
+            rocketDesignLoaderUI.Init(_rocketDesignManager.getCachedLabels(), _rocketDesignManager.getCachedCapabilities());
+
             _rocketDesignLoaderController = new RocketDesignLoaderController(rocketDesignLoaderUI, _rocketDesignManager);
 
             _rocketDesignLoaderController.OnComplete += delegate

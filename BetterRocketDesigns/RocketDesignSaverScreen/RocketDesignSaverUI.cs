@@ -45,7 +45,6 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
-        private GUIStyle filteredRocketDesignScrollViewStyle;
         private GUIStyle filteredRocketDesignHScrollViewStyle;
         private GUIStyle filteredRocketDesignVScrollViewStyle;
         private GUIStyle filteredRocketDesignButtonStyle;
@@ -425,7 +424,6 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 fixedWidth = 100,
             };
 
-            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
             filteredRocketDesignHScrollViewStyle = new GUIStyle(HighLogic.Skin.horizontalScrollbar);
             filteredRocketDesignVScrollViewStyle = new GUIStyle(HighLogic.Skin.verticalScrollbar);
 

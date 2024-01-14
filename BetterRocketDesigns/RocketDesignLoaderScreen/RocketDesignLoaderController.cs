@@ -12,15 +12,52 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private readonly RocketDesignManager _rocketDesignManager;
         public event Action OnComplete;
 
+        private RocketDesignFilter _rocketDesignFilter = new RocketDesignFilter();
+
         public RocketDesignLoaderController(RocketDesignLoaderUI ui, RocketDesignManager rocketDesignManager) { 
             _ui = ui;
             _rocketDesignManager = rocketDesignManager;
 
-            this._ui.OnFilterChanged += HandleFilterChanged;
-            this._ui.OnLoadButtonClicked += HandleLoadButtonClicked;
-            this._ui.OnCancelButtonClicked += HandleCancelClicked;
+            _ui.OnTextFilterChanged += HandleTextFilterChanged;
+            _ui.OnFilterLabelToggled += HandleLabelFilterToggled;
+            _ui.OnFilterCapabilityToggled += HandleFilterCapabilityToggled;
+            _ui.OnLoadButtonClicked += HandleLoadButtonClicked;
+            _ui.OnCancelButtonClicked += HandleCancelClicked;
 
-            this._ui.UpdateFilteredRocketDesigns(rocketDesignManager.GetCachedRocketDesigns());
+            _ui.UpdateFilterResults(rocketDesignManager.GetCachedRocketDesigns());
+        }
+
+        private void HandleLabelFilterToggled(string filterLabel, bool isSelected)
+        {
+            if (_rocketDesignFilter.FilterLabels.Contains(filterLabel))
+            {
+                _rocketDesignFilter.FilterLabels.Remove(filterLabel);
+            }
+
+            if (isSelected)
+            {
+                _rocketDesignFilter.FilterLabels.Add(filterLabel);
+            }
+
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilterResults(filteredRocketDesigns);
+        }
+        private void HandleFilterCapabilityToggled(string filterCapability, bool isSelected)
+        {
+            if (_rocketDesignFilter.FilterCapabilities.Contains(filterCapability))
+            {
+                _rocketDesignFilter.FilterCapabilities.Remove(filterCapability);
+            }
+
+            if (isSelected)
+            {
+                _rocketDesignFilter.FilterCapabilities.Add(filterCapability);
+            }
+
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilterResults(filteredRocketDesigns);
         }
 
         private void HandleLoadButtonClicked(RocketDesign design)
@@ -47,11 +84,13 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             OnComplete.Invoke();
         }
 
-        private void HandleFilterChanged(string filterCriteria)
+        private void HandleTextFilterChanged(string filterCriteria)
         {
-            //List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(filterCriteria);
+            _rocketDesignFilter.TextFilter = filterCriteria;
 
-            //this._ui.UpdateFilteredRocketDesigns(filteredRocketDesigns);
+            List<RocketDesign> filteredRocketDesigns = _rocketDesignManager.Filter(_rocketDesignFilter);
+
+            _ui.UpdateFilterResults(filteredRocketDesigns);
         }
 
         public void Close()
