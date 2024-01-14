@@ -90,7 +90,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             {
                 RocketDesign rocketDesign = this.filteredRocketDesigns[i];
 
-                string buttonText = $"<b>{rocketDesign.Name}</b>";
+                string buttonText = $"<b><size={HighLogic.Skin.font.fontSize * 1.5}>{rocketDesign.Name}</size></b>";
 
                 if (rocketDesign.Labels.Count > 0)
                 {
@@ -261,7 +261,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.Label(_selectedRocketDesign.Name, _detailNameLabelStyle);
 
             GUILayout.Label("Labels:");
-            _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(100));
 
             foreach(var label in _selectedRocketDesign.Labels)
             {
@@ -271,11 +271,11 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.EndScrollView();
 
             GUILayout.Label("Capabilities:");
-            _detailedCapabilitiesScrollPosition = GUILayout.BeginScrollView(_detailedCapabilitiesScrollPosition, _detailedCapabilitisScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            _detailedCapabilitiesScrollPosition = GUILayout.BeginScrollView(_detailedCapabilitiesScrollPosition, _detailedCapabilitisScrollViewStyle, GUILayout.Width(200), GUILayout.Height(100));
 
             foreach (var capabilityKvp in _selectedRocketDesign.Capabilities)
             {
-                GUILayout.Label(capabilityKvp.Key);
+                GUILayout.Label($"{capabilityKvp.Key}: {capabilityKvp.Value} t");
             }
 
             GUILayout.EndScrollView();
@@ -301,7 +301,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
-                fixedHeight = 70,
+                fixedHeight = 80,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
                 fontStyle = FontStyle.Normal,
