@@ -18,7 +18,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private List<RocketDesign> filteredRocketDesigns;
 
         private int _windowId;
-        private Rect _windowPosition = new Rect(0, 0, 600, 300);
+        private Rect _windowPosition;
         private string filterTextInputText;
         private Dictionary<string, bool> _filterLabelsSelection;
         private Dictionary<string, bool> _filterCapabilitiesSelection;
@@ -67,7 +67,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private void Start()
         {
             _windowId = GetInstanceID();
-            _windowPosition = new Rect(0, 0, 650, 300);
+            _windowPosition = new Rect(0, 0, 700, 450);
             _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
             _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
 
@@ -160,7 +160,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.BeginHorizontal();
 
             #region left-column
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.Width(200));
             OnWindowFilterLabelsColumn();
             GUILayout.EndVertical();
             #endregion
@@ -204,7 +204,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         {
             GUILayout.Label("Label filter (OR)");
 
-            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
             foreach (var filterLabel in _cachedFilterLabels)
             {
@@ -224,7 +224,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
             GUILayout.Label("Capability filter (OR)");
 
-            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
             foreach (var filterCapability in _cachedFilterCapabilities)
             {
@@ -267,7 +267,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.Label(_selectedRocketDesign.Name, _detailNameLabelStyle);
 
             GUILayout.Label("Labels:");
-            _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(100));
+            _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(100));
 
             foreach(var label in _selectedRocketDesign.Labels)
             {
@@ -277,7 +277,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.EndScrollView();
 
             GUILayout.Label("Capabilities:");
-            _detailedCapabilitiesScrollPosition = GUILayout.BeginScrollView(_detailedCapabilitiesScrollPosition, _detailedCapabilitisScrollViewStyle, GUILayout.Width(200), GUILayout.Height(100));
+            _detailedCapabilitiesScrollPosition = GUILayout.BeginScrollView(_detailedCapabilitiesScrollPosition, _detailedCapabilitisScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(100));
 
             foreach (var capabilityKvp in _selectedRocketDesign.Capabilities)
             {
@@ -297,7 +297,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
             filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField)
             {
-                fixedWidth = 300
+                fixedWidth = 300,
             };
 
             filterLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
