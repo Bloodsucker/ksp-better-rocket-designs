@@ -28,7 +28,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities"};
 
         private int _windowId;
-        private Rect _windowPosition = new Rect(0, 0, 600, 300);
+        private Rect _windowPosition;
         private string filterTextInputText = "";
         private Dictionary<string, bool> _filterLabelsSelection;
         private Dictionary<string, bool> _filterCapabilitiesSelection;
@@ -45,8 +45,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private GUIStyle rocketDesignSaverWindowStyle;
         private GUIStyle filterTextInputStyle;
-        private GUIStyle filteredRocketDesignHScrollViewStyle;
-        private GUIStyle filteredRocketDesignVScrollViewStyle;
+        private GUIStyle filteredRocketDesignScrollViewStyle;
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle saveOrReplaceButtonStyle;
         private GUIStyle cancelButtonStyle;
@@ -87,6 +86,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private void Start()
         {
             _windowId = GetInstanceID();
+            _windowPosition = new Rect(0, 0, 700, 450);
             _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
             _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
             saveButtonAsReplaceButton = false;
@@ -178,35 +178,38 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
 
             #region top-section
-            GUILayout.BeginHorizontal();
-            filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
-
-            if (GUI.changed)
+            using (new GUILayout.HorizontalScope())
             {
-                HandleFilterTextInputChange(filterTextInputText);
+                GUILayout.FlexibleSpace();
+
+                filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
+
+                if (GUI.changed)
+                {
+                    HandleFilterTextInputChange(filterTextInputText);
+                }
+
+                GUI.enabled = filterTextInputText.Length != 0;
+
+                if (GUILayout.Button(saveButtonAsReplaceButton ? "Replace" : "Save", saveOrReplaceButtonStyle))
+                {
+                    HandleSaveButtonClick();
+                }
+
+                GUI.enabled = true;
+
+                if (GUILayout.Button("Cancel", cancelButtonStyle))
+                {
+                    HandleCancelButtonClick();
+                }
             }
-
-            GUI.enabled = filterTextInputText.Length != 0;
-
-            if (GUILayout.Button(saveButtonAsReplaceButton ? "Replace" : "Save", saveOrReplaceButtonStyle))
-            {
-                HandleSaveButtonClick();
-            }
-
-            GUI.enabled = true;
-
-            if (GUILayout.Button("Cancel", cancelButtonStyle))
-            {
-                HandleCancelButtonClick();
-            }
-            GUILayout.EndHorizontal();
             #endregion
 
             #region body-section
             GUILayout.BeginHorizontal();
 
             #region left-column
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.Width(200));
             OnWindowFilterLabelsColumn();
             GUILayout.EndVertical();
             #endregion
@@ -233,7 +236,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         {
             GUILayout.Label("Label filter (OR)");
 
-            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
             foreach(var filterLabel in _cachedFilterLabels)
             {
@@ -253,7 +256,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             GUILayout.Label("Capability filter (OR)");
 
-            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
+            filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
             foreach(var filterCapability in _cachedFilterCapabilities)
             {
@@ -275,7 +278,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
             GUILayout.Label("Copy all Metadata from:");
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(200), GUILayout.MaxWidth(200));
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle, GUILayout.Width(300), GUILayout.MaxWidth(300));
 
             int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
             if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
@@ -411,6 +414,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField)
             {
+                fixedWidth = 300,
                 fixedHeight = HighLogic.Skin.button.CalcHeight(new GUIContent(), 20),
                 alignment = TextAnchor.MiddleLeft,
             };
@@ -424,13 +428,12 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 fixedWidth = 100,
             };
 
-            filteredRocketDesignHScrollViewStyle = new GUIStyle(HighLogic.Skin.horizontalScrollbar);
-            filteredRocketDesignVScrollViewStyle = new GUIStyle(HighLogic.Skin.verticalScrollbar);
+            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
 
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
                 stretchWidth = true,
-                fixedHeight = 70,
+                fixedHeight = 80,
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
                 fontStyle = FontStyle.Normal,
