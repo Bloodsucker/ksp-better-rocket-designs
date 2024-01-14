@@ -18,6 +18,10 @@ namespace BetterRocketDesigns.ksp
         {
             List<IConfigNodeAdapter> craftList = new List<IConfigNodeAdapter>();
 
+            string fullRocketDesignFolderPath = getFullRocketDesignFolderPath();
+
+            if (!Directory.Exists(fullRocketDesignFolderPath)) return craftList;
+
             string[] craftFiles = Directory.GetFiles(getFullRocketDesignFolderPath(), "*.craft");
 
             foreach (string craftFile in craftFiles)
