@@ -185,7 +185,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             GUILayout.FlexibleSpace();
 
             GUI.enabled = _selectedRocketDesign != null;
-            if (GUILayout.Button("load", loadButtonStyle))
+            if (GUILayout.Button("Add to Editor", loadButtonStyle))
             {
                 OnLoadButtonClicked.Invoke(_selectedRocketDesign);
             }
