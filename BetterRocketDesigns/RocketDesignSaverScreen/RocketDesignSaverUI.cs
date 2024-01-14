@@ -113,7 +113,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             {
                 RocketDesign rocketDesign = this.filteredRocketDesigns[i];
 
-                string buttonText = $"<b>{rocketDesign.Name}</b>";
+                string buttonText = $"<b><color=#FFC600><size={HighLogic.Skin.font.fontSize * 1.5}>{rocketDesign.Name}</size></color></b>";
 
                 if (rocketDesign.Labels.Count > 0)
                 {

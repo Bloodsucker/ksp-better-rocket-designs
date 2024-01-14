@@ -8,8 +8,8 @@ namespace BetterRocketDesigns
         private List<RocketDesign> _cachedRocketDesigns;
         private IRocketDesignLoader _rocketDesignLoader;
 
-        private HashSet<string> _labels = new HashSet<string>();
-        private HashSet<string> _capabilities = new HashSet<string>();
+        private SortedSet<string> _labels = new SortedSet<string>();
+        private SortedSet<string> _capabilities = new SortedSet<string>();
 
         public RocketDesignManager(IRocketDesignLoader rocketDesignLoader)
         {
@@ -19,8 +19,8 @@ namespace BetterRocketDesigns
 
         public void LoadAllRocketDesigns()
         {
-            _labels = new HashSet<string>();
-            _capabilities = new HashSet<string>();
+            _labels = new SortedSet<string>();
+            _capabilities = new SortedSet<string>();
             _cachedRocketDesigns = new List<RocketDesign>();
 
             List<IConfigNodeAdapter> configNodes = _rocketDesignLoader.LoadAllRocketDesigns();
@@ -29,25 +29,16 @@ namespace BetterRocketDesigns
             {
                 RocketDesign rocketDesign = new RocketDesign(configNode);
 
-                foreach(var label in rocketDesign.Labels)
-                {
-                    if (!_labels.Contains(label))
-                    {
-                        _labels.Add(label);
-                    }
-                }
-
-                foreach(var capabilityKvp in rocketDesign.Capabilities)
-                {
-                    if (!_capabilities.Contains(capabilityKvp.Key))
-                    {
-                        _capabilities.Add(capabilityKvp.Key);
-
-                    }
-                }
-
                 _cachedRocketDesigns.Add(rocketDesign);
             }
+
+            ReloadCachedRocketDesignMetadata();
+        }
+
+        private void ReloadCachedRocketDesignMetadata()
+        {
+            _labels = new SortedSet<string>(_cachedRocketDesigns.SelectMany(rd => rd.Labels).Distinct());
+            _capabilities = new SortedSet<string>(_cachedRocketDesigns.SelectMany(rd => rd.Capabilities.Keys).Distinct());
         }
 
         public List<RocketDesign> GetCachedRocketDesigns()
@@ -76,6 +67,8 @@ namespace BetterRocketDesigns
             }
 
             _cachedRocketDesigns.Add(rocketDesign);
+
+            ReloadCachedRocketDesignMetadata();
 
             return rocketDesign;
         }
