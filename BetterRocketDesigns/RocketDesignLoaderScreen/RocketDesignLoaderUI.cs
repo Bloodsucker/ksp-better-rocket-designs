@@ -143,11 +143,17 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
         private void OnWindow(int windowId)
         {
-            filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
-
-            if (GUI.changed)
+            using(new GUILayout.HorizontalScope())
             {
-                HandleFilterTextInputChange(filterTextInputText);
+                GUILayout.FlexibleSpace();
+                filterTextInputText = GUILayout.TextField(filterTextInputText, filterTextInputStyle);
+
+                if (GUI.changed)
+                {
+                    HandleFilterTextInputChange(filterTextInputText);
+                }
+
+                GUILayout.FlexibleSpace();
             }
 
             #region body-section
@@ -289,7 +295,10 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
                 stretchHeight = true
             };
 
-            filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField);
+            filterTextInputStyle = new GUIStyle(HighLogic.Skin.textField)
+            {
+                fixedWidth = 300
+            };
 
             filterLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
             _filterLabelSelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
