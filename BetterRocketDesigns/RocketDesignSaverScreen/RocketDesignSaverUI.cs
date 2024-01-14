@@ -18,29 +18,28 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         public event Action<string> OnAddNewLabelButtonClicked;
         public event Action<string> OnRemoveNewLabelButtonClicked;
 
-
         private RocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
         private IReadOnlyCollection<string> _cachedFilterLabels;
         private IReadOnlyCollection<string> _cachedFilterCapabilities;
         private bool saveButtonAsReplaceButton;
-        private List<GUIContent> fileteredRocketDesignsContentGrid = new List<GUIContent>();
-        private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities"};
+        private List<GUIContent> fileteredRocketDesignsContentGrid;
+        private readonly string[] _newRocketDesignToolbarOptions = { "Labels", "Capabilities" };
 
         private int _windowId;
         private Rect _windowPosition;
-        private string filterTextInputText = "";
+        private string filterTextInputText;
         private Dictionary<string, bool> _filterLabelsSelection;
         private Dictionary<string, bool> _filterCapabilitiesSelection;
         private Vector2 filterLabelsScrollPosition;
         private Vector2 filterCapabilitiesScrollPosition;
         private Vector2 filteredRocketDesignScrollPosition;
-        private int filteredRocketDesignsSelectedGrid = -1;
+        private int filteredRocketDesignsSelectedGrid;
         private Vector2 newRocketDesignNewLabelsScrollPosition;
-        private string newRocketDesignNewLabelInputText = "";
-        private int _newRocketDesignToolbarSelection = 0;
-        private string newRocketDesignNewCapabilityNameInputText = "";
-        private string newRocketDesignNewCapabilityValueInputText = "";
+        private string newRocketDesignNewLabelInputText;
+        private int _newRocketDesignToolbarSelection;
+        private string newRocketDesignNewCapabilityNameInputText;
+        private string newRocketDesignNewCapabilityValueInputText;
         private Vector2 newCapabilityScrollPosition;
 
         private GUIStyle rocketDesignSaverWindowStyle;
@@ -71,13 +70,13 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             _cachedFilterCapabilities = cachedCapabilities;
 
             _filterLabelsSelection = new Dictionary<string, bool>();
-            foreach(var label in _cachedFilterLabels)
+            foreach (var label in _cachedFilterLabels)
             {
                 _filterLabelsSelection.Add(label, false);
             }
 
             _filterCapabilitiesSelection = new Dictionary<string, bool>();
-            foreach(var capabilities in _cachedFilterCapabilities)
+            foreach (var capabilities in _cachedFilterCapabilities)
             {
                 _filterCapabilitiesSelection.Add(capabilities, false);
             }
@@ -89,7 +88,14 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
             _windowPosition = new Rect(0, 0, 700, 450);
             _windowPosition.x = (Screen.width - _windowPosition.width) / 2;
             _windowPosition.y = (Screen.height - _windowPosition.height) / 2;
+
+            filterTextInputText = "";
             saveButtonAsReplaceButton = false;
+            filteredRocketDesignsSelectedGrid = -1;
+            newRocketDesignNewLabelInputText = "";
+            _newRocketDesignToolbarSelection = 0;
+            newRocketDesignNewCapabilityNameInputText = "";
+            newRocketDesignNewCapabilityValueInputText = "";
 
             InitStyle();
         }
@@ -112,7 +118,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 if (rocketDesign.Labels.Count > 0)
                 {
                     string labelsButtonText = string.Join(" - ", rocketDesign.Labels);
-                    
+
                     string newLabelsButtonText = labelsButtonText.Substring(0, Math.Min(29, labelsButtonText.Length));
                     if (newLabelsButtonText.Length != labelsButtonText.Length) newLabelsButtonText += "…";
                     labelsButtonText = newLabelsButtonText;
@@ -123,7 +129,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
                 if (rocketDesign.Capabilities.Count > 0)
                 {
                     string capabilitiesButtonText = string.Join("; ", rocketDesign.Capabilities.Select(kvp => $"{kvp.Key}: {kvp.Value} t"));
-                    
+
                     string newCapabilitiesButtonText = capabilitiesButtonText.Substring(0, Math.Min(26, capabilitiesButtonText.Length));
                     if (newCapabilitiesButtonText.Length != capabilitiesButtonText.Length) newCapabilitiesButtonText += "…";
                     capabilitiesButtonText = newCapabilitiesButtonText;
@@ -238,7 +244,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             filterLabelsScrollPosition = GUILayout.BeginScrollView(filterLabelsScrollPosition, filterLabelsScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
-            foreach(var filterLabel in _cachedFilterLabels)
+            foreach (var filterLabel in _cachedFilterLabels)
             {
                 _filterLabelsSelection.TryGetValue(filterLabel, out bool isSelected);
                 isSelected = GUILayout.Toggle(isSelected, filterLabel, _filterLabelSelectionToggleStyle);
@@ -258,7 +264,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
             filterCapabilitiesScrollPosition = GUILayout.BeginScrollView(filterCapabilitiesScrollPosition, filterCapabilitiesScrollViewStyle, GUILayout.ExpandWidth(true), GUILayout.Height(150));
 
-            foreach(var filterCapability in _cachedFilterCapabilities)
+            foreach (var filterCapability in _cachedFilterCapabilities)
             {
                 _filterCapabilitiesSelection.TryGetValue(filterCapability, out bool isSelected);
                 isSelected = GUILayout.Toggle(isSelected, filterCapability, _filterCapabilitySelectionToggleStyle);
