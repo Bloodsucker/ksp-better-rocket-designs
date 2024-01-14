@@ -43,12 +43,9 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private GUIStyle filterCapabilitiesScrollViewStyle;
         private GUIStyle _filterCapabilitySelectionToggleStyle;
         private GUIStyle _filterLabelSelectionToggleStyle;
-        private GUIStyle _detailedLabelsHScrollViewStyle;
-        private GUIStyle _detailedLabelsVScrollViewStyle;
-        private GUIStyle _detailedCapabilitisHScrollViewStyle;
-        private GUIStyle _detailedCapabilitisVScrollViewStyle;
         private GUIStyle _detailedLabelsScrollViewStyle;
         private GUIStyle _detailedCapabilitisScrollViewStyle;
+        private GUIStyle _detailNameLabelStyle;
 
         public void Init(IReadOnlyCollection<string> cachedLabels, IReadOnlyCollection<string> cachedCapabilities)
         {
@@ -262,8 +259,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
 
             if (_selectedRocketDesign == null) return;
 
-            GUILayout.Label("Name:");
-            GUILayout.Label(_selectedRocketDesign.Name);
+            GUILayout.Label(_selectedRocketDesign.Name, _detailNameLabelStyle);
 
             GUILayout.Label("Labels:");
             _detailedLabelsScrollPosition = GUILayout.BeginScrollView(_detailedLabelsScrollPosition, _detailedLabelsScrollViewStyle, GUILayout.Width(200), GUILayout.Height(150));
@@ -311,6 +307,12 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
                 alignment = TextAnchor.MiddleLeft,
                 richText = true,
                 fontStyle = FontStyle.Normal,
+            };
+
+            _detailNameLabelStyle = new GUIStyle(HighLogic.Skin.label)
+            {
+                fontStyle = FontStyle.Bold,
+                fontSize = HighLogic.Skin.font.fontSize * 2,
             };
 
             _detailedLabelsScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
