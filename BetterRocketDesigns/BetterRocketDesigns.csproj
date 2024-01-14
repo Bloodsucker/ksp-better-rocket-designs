@@ -79,9 +79,14 @@
     <Compile Include="utils\CraftTools.cs" />
     <Compile Include="utils\Tools.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Textures\open-64p.png" />
+    <Content Include="Textures\save-as-64p.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y "$(TargetDir)BetterRocketDesigns.dll" "$(KSP_DEV)\GameData"
-xcopy /y "$(TargetDir)BetterRocketDesigns.pdb" "$(KSP_DEV)\GameData"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /I "$(TargetDir)BetterRocketDesigns.dll" "$(KSP_DEV)\GameData\BetterRocketDesigns\"
+xcopy /Y /I "$(TargetDir)BetterRocketDesigns.pdb" "$(KSP_DEV)\GameData\BetterRocketDesigns\"
+xcopy /Y /I /E "$(ProjectDir)\Textures" "$(KSP_DEV)\GameData\BetterRocketDesigns\Textures"</PostBuildEvent>
   </PropertyGroup>
 </Project>

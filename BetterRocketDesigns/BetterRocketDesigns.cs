@@ -20,9 +20,14 @@ namespace BetterRocketDesigns
         private bool _isRocketDesignLoaderWindowOpen = false;
         private RocketDesignSaverController rocketDesignSaverController;
         private RocketDesignLoaderController _rocketDesignLoaderController;
+        private Texture2D loadRocketDesignToolbarIcon;
+        private Texture2D saveAsRocketDesignToolbarIcon;
 
         private void Start()
         {
+            loadRocketDesignToolbarIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/open-64p", false);
+            saveAsRocketDesignToolbarIcon = GameDatabase.Instance.GetTexture("BetterRocketDesigns/Textures/save-as-64p", false);
+
             _isRocketDesignSaverWindowOpen = false;
             _isRocketDesignLoaderWindowOpen = false;
 
@@ -37,7 +42,7 @@ namespace BetterRocketDesigns
                 DummyMethod, DummyMethod,
                 DummyMethod, DummyMethod,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
-                Tools.MakeTexture(32, 32, Color.yellow));
+                loadRocketDesignToolbarIcon);
 
             GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
         }
@@ -55,7 +60,7 @@ namespace BetterRocketDesigns
                 DummyMethod, DummyMethod,
                 DummyMethod, DummyMethod,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
-                Tools.MakeTexture(32, 32, Color.blue));
+                saveAsRocketDesignToolbarIcon);
         }
 
         private void HideSaveToolbarButton()
