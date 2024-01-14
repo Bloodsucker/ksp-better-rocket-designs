@@ -37,8 +37,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private GUIStyle filteredRocketDesignButtonStyle;
         private GUIStyle loadButtonStyle;
         private GUIStyle cancelButtonStyle;
-        private GUIStyle filteredRocketDesignHScrollViewStyle;
-        private GUIStyle filteredRocketDesignVScrollViewStyle;
+        private GUIStyle filteredRocketDesignScrollViewStyle;
         private GUIStyle filterLabelsScrollViewStyle;
         private GUIStyle filterCapabilitiesScrollViewStyle;
         private GUIStyle _filterCapabilitySelectionToggleStyle;
@@ -241,7 +240,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
         private void OnWindowDrawFilteredRocketDesignsColumn()
         {
             GUILayout.Label("Choose and Load:");
-            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, false, true, filteredRocketDesignHScrollViewStyle, filteredRocketDesignVScrollViewStyle, GUILayout.Width(300), GUILayout.MaxWidth(300));
+            filteredRocketDesignScrollPosition = GUILayout.BeginScrollView(filteredRocketDesignScrollPosition, filteredRocketDesignScrollViewStyle, GUILayout.Width(300), GUILayout.MaxWidth(300));
 
             int newFilteredRocketDesignsSelectedGrid = GUILayout.SelectionGrid(filteredRocketDesignsSelectedGrid, fileteredRocketDesignsContentGrid.ToArray(), 1, filteredRocketDesignButtonStyle);
             if (newFilteredRocketDesignsSelectedGrid != filteredRocketDesignsSelectedGrid)
@@ -297,8 +296,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             filterCapabilitiesScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
             _filterCapabilitySelectionToggleStyle = new GUIStyle(HighLogic.Skin.toggle);
 
-            filteredRocketDesignHScrollViewStyle = new GUIStyle(HighLogic.Skin.horizontalScrollbar);
-            filteredRocketDesignVScrollViewStyle = new GUIStyle(HighLogic.Skin.verticalScrollbar);
+            filteredRocketDesignScrollViewStyle = new GUIStyle(HighLogic.Skin.scrollView);
 
             filteredRocketDesignButtonStyle = new GUIStyle(HighLogic.Skin.button)
             {
