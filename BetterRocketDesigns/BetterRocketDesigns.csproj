@@ -85,7 +85,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y /I "$(TargetDir)BetterRocketDesigns.dll" "$(KSP_DEV)\GameData\BetterRocketDesigns\"
+    <PostBuildEvent Condition="'$(OS)' == 'Windows_NT'">xcopy /Y /I "$(TargetDir)BetterRocketDesigns.dll" "$(KSP_DEV)\GameData\BetterRocketDesigns\"
 xcopy /Y /I "$(TargetDir)BetterRocketDesigns.pdb" "$(KSP_DEV)\GameData\BetterRocketDesigns\"
 xcopy /Y /I /E "$(ProjectDir)\Textures" "$(KSP_DEV)\GameData\BetterRocketDesigns\Textures"</PostBuildEvent>
   </PropertyGroup>
