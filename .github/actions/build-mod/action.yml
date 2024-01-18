@@ -6,7 +6,7 @@ inputs:
   tmp_path:
     required: true
 outputs:
-  zip-path:
+  zip_path:
     value: ${{ steps.building.outputs.zip_path }}
 
 runs:
