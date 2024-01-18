@@ -23,6 +23,10 @@ jobs:
         with:
           ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
           tmp_path: ${{ runner.temp }}
+      - name: Setup git config
+        run: |
+          git config user.name "Github Actions Bot"
+          git config user.email "<>"
       - name: Finalizing release - Git
         run: |
           RELEASE_BRANCH="release/v${{ inputs.new_version }}"
@@ -30,7 +34,7 @@ jobs:
           git add *
           git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
           git checkout master
-          git merge --no-ff $RELEASE_BRANCH -m "Merge branch 'release/v${{ inputs.new_version }}' into master"
+          git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
           git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
           git log --oneline --graph -n 5
 #          git push origin master --tags
