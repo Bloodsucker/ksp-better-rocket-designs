@@ -1,0 +1,36 @@
+name: make-release
+
+on:
+  workflow_dispatch:
+    inputs:
+        new_version:
+            type: string
+            required: true
+
+jobs:
+  make-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate requirements
+        run: |
+          [[ "${{ inputs.new_version }}" ]] || { echo "new_version input is empty" ; exit 1; }
+      - uses: actions/checkout@v4
+      - name: Bummping version
+        run: python3 update-version.py ${{ inputs.new_version }}
+      - run: git status
+      - id: build-mod
+        uses: ./.github/actions/build-mod
+        with:
+          ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
+          tmp_path: ${{ runner.temp }}
+      - name: Finalizing release - Git
+        run: |
+          RELEASE_BRANCH="release/v${{ inputs.new_version }}"
+          git checkout -b $RELEASE_BRANCH
+          git add *
+          git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
+          git checkout master
+          git merge --no-ff $RELEASE_BRANCH -m "Merge branch 'release/v${{ inputs.new_version }}' into master"
+          git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
+          git log --oneline --graph -n 5
+#          git push origin master --tags

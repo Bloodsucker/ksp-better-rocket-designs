@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 # Other
 build/*
+.vscode/launch.json
+.github/tests
