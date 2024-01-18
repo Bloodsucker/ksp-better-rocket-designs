@@ -1,0 +1,29 @@
+name: 'Build mod'
+description: 'Builds KSP mod'
+inputs:
+  ksp_dlls_donwload_url:
+    required: true
+  tmp_path:
+    required: true
+outputs:
+  zip-path:
+    value: ${{ steps.building.outputs.zip_path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate requirements
+      id: validate-requirements
+      run: |
+        [[ "${{ inputs.ksp_dlls_donwload_url }}" ]] || { echo "ksp_dlls_donwload_url input is empty" ; exit 1; }
+        [[ "${{ inputs.tmp_path }}" ]] || { echo "tmp_path input is empty" ; exit 1; }
+    - name: Download KSP Assemblies (Dlls)
+      id: download-assemblies
+      run: |
+        curl "${{ inputs.ksp_dlls_donwload_url }}" -L --output ${{ inputs.tmp_path }}/dlls.zip
+        unzip ${{ inputs.tmp_path }}/dlls.zip -d ${{ inputs.tmp_path }}/dlls
+        echo "ksp_dlls_path=${{ inputs.tmp_path }}/dlls/ksp-assemblies" >> $GITHUB_OUTPUT
+    - id: building
+      run: |
+        make DLLS_PATH=${{ steps.download-assemblies.outputs.ksp_dlls_path }}
+        echo "zip_path=$GITHUB_WORKSPACE/build/bin/Release/BetterRocketDesigns.zip" >> $GITHUB_OUTPUT

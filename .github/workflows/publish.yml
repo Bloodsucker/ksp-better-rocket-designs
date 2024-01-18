@@ -1,0 +1,28 @@
+﻿name: better-rocket-designs
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: find .
+      - id: build-mod
+        uses: ./.github/actions/build-mod
+        with:
+          ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
+          tmp_path: ${{ runner.temp }}
+      - name: Preparing Release files
+        id: release-files
+        run: |
+          mkdir -p $RUNNER_TEMP/release
+          mv ${{ steps.build-mod.outputs.zip_path }} $RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip
+          echo "release_zip=$RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip" >> $GITHUB_OUTPUT
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.release-files.outputs.release_zip }}
