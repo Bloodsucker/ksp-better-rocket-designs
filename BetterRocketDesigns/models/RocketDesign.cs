@@ -11,10 +11,18 @@ namespace BetterRocketDesigns
         private string _name;
         private List<string> _labels;
         private Dictionary<string, float> _capabilities;
+        public string CraftPath { get; set; }
 
-        public RocketDesign(IConfigNodeAdapter configNode) {
-            ThumbnailImage = Tools.MakeTexture(32, 32, Color.magenta);
+        public RocketDesign(IConfigNodeAdapter configNode)
+        {
             _configNode = configNode;
+
+            UpdatePropertiesFromConfigNode();
+        }
+        public RocketDesign(IConfigNodeAdapter configNode, string craftPath)
+        {
+            _configNode = configNode;
+            CraftPath = craftPath;
 
             UpdatePropertiesFromConfigNode();
         }
@@ -47,14 +55,6 @@ namespace BetterRocketDesigns
                 _capabilities = value.ToDictionary(pair => pair.Key, pair => pair.Value);
                 UpdateConfigNode();
             }
-        }
-
-        private Texture2D _thumbnailImage;
-
-        public Texture2D ThumbnailImage
-        {
-            get { return _thumbnailImage; }
-            set { _thumbnailImage = value; }
         }
 
         public IConfigNodeAdapter ConfigNode {

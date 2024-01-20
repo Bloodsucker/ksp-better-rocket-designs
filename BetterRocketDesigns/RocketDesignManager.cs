@@ -21,16 +21,8 @@ namespace BetterRocketDesigns
         {
             _labels = new SortedSet<string>();
             _capabilities = new SortedSet<string>();
-            _cachedRocketDesigns = new List<RocketDesign>();
 
-            List<IConfigNodeAdapter> configNodes = _rocketDesignLoader.LoadAllRocketDesigns();
-
-            foreach (var configNode in configNodes)
-            {
-                RocketDesign rocketDesign = new RocketDesign(configNode);
-
-                _cachedRocketDesigns.Add(rocketDesign);
-            }
+            _cachedRocketDesigns = _rocketDesignLoader.LoadAllRocketDesigns();
 
             ReloadCachedRocketDesignMetadata();
         }
@@ -58,7 +50,7 @@ namespace BetterRocketDesigns
 
         public RocketDesign SaveOrReplaceAsRocketDesign(RocketDesign rocketDesign)
         {
-            _rocketDesignLoader.SaveRocketDesign(rocketDesign.Name, rocketDesign.ConfigNode);
+            _rocketDesignLoader.SaveRocketDesign(rocketDesign);
 
             int index = _cachedRocketDesigns.FindIndex(rd => rd.Name == rocketDesign.Name);
             if (index != -1)
