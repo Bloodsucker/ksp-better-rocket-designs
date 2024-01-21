@@ -34,7 +34,7 @@ namespace BetterRocketDesigns.ksp
 
         public void SetValue(string key, IReadOnlyCollection<string> values)
         {
-            configNode.RemoveValue(key);
+            configNode.RemoveValues(key);
 
             foreach (string value in values)
             {
