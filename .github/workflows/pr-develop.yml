@@ -1,0 +1,17 @@
+name: "PR to develop"
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  validate-dev-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: build-mod
+        uses: ./.github/actions/build-mod
+        with:
+          ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
+          tmp_path: ${{ runner.temp }}
