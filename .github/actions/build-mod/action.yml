@@ -3,6 +3,8 @@ description: 'Builds KSP mod'
 inputs:
   ksp_dlls_donwload_url:
     required: true
+  ksp_dlls_password:
+    required: true
   tmp_path:
     required: true
 outputs:
@@ -17,14 +19,15 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.ksp_dlls_donwload_url }}" ]] || { echo "ksp_dlls_donwload_url input is empty" ; exit 1; }
+        [[ "${{ inputs.ksp_dlls_password }}" ]] || { echo "ksp_dlls_password input is empty" ; exit 1; }
         [[ "${{ inputs.tmp_path }}" ]] || { echo "tmp_path input is empty" ; exit 1; }
     - name: Download KSP Assemblies (Dlls)
       id: download-assemblies
       shell: bash
       run: |
         curl "${{ inputs.ksp_dlls_donwload_url }}" -L --output ${{ inputs.tmp_path }}/dlls.zip
-        unzip ${{ inputs.tmp_path }}/dlls.zip -d ${{ inputs.tmp_path }}/dlls
-        echo "ksp_dlls_path=${{ inputs.tmp_path }}/dlls/ksp-assemblies" >> $GITHUB_OUTPUT
+        unzip -P ${{ inputs.ksp_dlls_password }} ${{ inputs.tmp_path }}/dlls.zip  -d ${{ inputs.tmp_path }}/dlls
+        echo "ksp_dlls_path=${{ inputs.tmp_path }}/dlls" >> $GITHUB_OUTPUT
     - id: building
       shell: bash
       run: |

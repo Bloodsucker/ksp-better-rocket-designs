@@ -22,6 +22,7 @@ jobs:
         uses: ./.github/actions/build-mod
         with:
           ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
+          ksp_dlls_password: ${{ secrets.KSP_DLLS_PASSWORD }}
           tmp_path: ${{ runner.temp }}
       - name: Setup git config
         run: |
