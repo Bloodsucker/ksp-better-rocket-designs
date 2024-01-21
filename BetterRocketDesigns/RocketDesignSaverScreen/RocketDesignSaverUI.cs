@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClickThroughFix;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -177,7 +178,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 
         private void OnGUI()
         {
-            _windowPosition = GUILayout.Window(_windowId, _windowPosition, OnWindow, "Save Rocket Design as", rocketDesignSaverWindowStyle);
+            _windowPosition = ClickThruBlocker.GUILayoutWindow(_windowId, _windowPosition, OnWindow, "Save Rocket Design as", rocketDesignSaverWindowStyle);
         }
 
         private void OnWindow(int windowId)
