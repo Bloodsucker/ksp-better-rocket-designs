@@ -48,9 +48,9 @@ namespace BetterRocketDesigns
             return _capabilities;
         }
 
-        public RocketDesign SaveOrReplaceAsRocketDesign(RocketDesign rocketDesign)
+        public RocketDesign SaveOrReplaceAsRocketDesign(UnsavedRocketDesign unsavedRocketDesign)
         {
-            _rocketDesignLoader.SaveRocketDesign(rocketDesign);
+            RocketDesign rocketDesign = _rocketDesignLoader.SaveRocketDesign(unsavedRocketDesign);
 
             int index = _cachedRocketDesigns.FindIndex(rd => rd.Name == rocketDesign.Name);
             if (index != -1)

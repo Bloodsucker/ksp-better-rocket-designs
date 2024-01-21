@@ -1,86 +1,44 @@
-﻿using BetterRocketDesigns.utils;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BetterRocketDesigns
 {
-    internal class RocketDesign
+    class RocketDesign
     {
-        private IConfigNodeAdapter _configNode;
-        private string _name;
-        private List<string> _labels;
-        private Dictionary<string, float> _capabilities;
-        public string CraftPath { get; set; }
+        public IConfigNodeAdapter ConfigNode { get; private set; }
+        public string Name { get; private set; }
+        public IReadOnlyCollection<string> Labels { get; private set; }
+        public IReadOnlyDictionary<string, float> Capabilities { get; private set; }
+        public string CraftPath { get; private set; }
 
-        public RocketDesign(IConfigNodeAdapter configNode)
+        public RocketDesign(UnsavedRocketDesign unsavedRocket, string craftPat)
         {
-            _configNode = configNode;
+            ConfigNode = unsavedRocket.ConfigNode;
+            CraftPath = craftPat;
 
             UpdatePropertiesFromConfigNode();
         }
+
         public RocketDesign(IConfigNodeAdapter configNode, string craftPath)
         {
-            _configNode = configNode;
             CraftPath = craftPath;
+            ConfigNode = configNode;
 
             UpdatePropertiesFromConfigNode();
-        }
-
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                UpdateConfigNode();
-            }
-        }
-
-        public IReadOnlyList<string> Labels
-        {
-            get { return _labels; }
-            set
-            {
-                _labels = new List<string>(value);
-                UpdateConfigNode();
-            }
-        }
-
-        public IReadOnlyDictionary<string, float> Capabilities
-        {
-            get { return _capabilities; }
-            set
-            {
-                _capabilities = value.ToDictionary(pair => pair.Key, pair => pair.Value);
-                UpdateConfigNode();
-            }
-        }
-
-        public IConfigNodeAdapter ConfigNode {
-            get
-            {
-                return _configNode;
-            }
-
-            set
-            {
-                _configNode = value;
-                UpdatePropertiesFromConfigNode();
-            }
-        }
-        private void UpdateConfigNode()
-        {
-            _configNode.SetValue("ship", _name);
-            _configNode.SetValue("labels", _labels);
-            _configNode.SetValue("capabilities", _capabilities);
         }
 
         private void UpdatePropertiesFromConfigNode()
         {
-            _name = _configNode.GetValue("ship");
-            _configNode.GetValues("labels", out _labels);
-            _configNode.GetValue("capabilities", out _capabilities);
+            Name = ConfigNode.GetValue("ship");
+
+            ConfigNode.GetValues("labels", out List<string> labels);
+            Labels = new SortedSet<string>(labels);
+
+            ConfigNode.GetValue("capabilities", out Dictionary<string, float> capabilities);
+            Capabilities = capabilities;
         }
     }
 }

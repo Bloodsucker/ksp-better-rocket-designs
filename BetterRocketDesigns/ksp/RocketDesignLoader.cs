@@ -37,7 +37,7 @@ namespace BetterRocketDesigns.ksp
             return rocketDesigns;
         }
 
-        public void SaveRocketDesign(RocketDesign rocketDesign)
+        public RocketDesign SaveRocketDesign(UnsavedRocketDesign rocketDesign)
         {
             if(!Directory.Exists(getFullRocketDesignFolderPath()))
             {
@@ -51,7 +51,7 @@ namespace BetterRocketDesigns.ksp
 
             configNode.Save(craftFilePath);
 
-            rocketDesign.CraftPath = craftFilePath;
+            return new RocketDesign(configNode, craftFilePath);
         }
 
         private string getFullRocketDesignFolderPath()

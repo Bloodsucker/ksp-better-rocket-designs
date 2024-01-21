@@ -18,7 +18,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         public event Action<string> OnAddNewLabelButtonClicked;
         public event Action<string> OnRemoveNewLabelButtonClicked;
 
-        private RocketDesign _newRocketDesign;
+        private UnsavedRocketDesign _newRocketDesign;
         private List<RocketDesign> filteredRocketDesigns;
         private IReadOnlyCollection<string> _cachedFilterLabels;
         private IReadOnlyCollection<string> _cachedFilterCapabilities;
@@ -63,7 +63,7 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
         private GUIStyle newCapabilityScrollViewStyle;
         private GUIStyle newCapabilityRemoveButtonStyle;
 
-        public void Init(RocketDesign newRocketDesign, IReadOnlyCollection<string> cachedLabels, IReadOnlyCollection<string> cachedCapabilities)
+        public void Init(UnsavedRocketDesign newRocketDesign, IReadOnlyCollection<string> cachedLabels, IReadOnlyCollection<string> cachedCapabilities)
         {
             _newRocketDesign = newRocketDesign;
             _cachedFilterLabels = cachedLabels;

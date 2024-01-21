@@ -5,6 +5,6 @@ namespace BetterRocketDesigns
     internal interface IRocketDesignLoader
     {
         List<RocketDesign> LoadAllRocketDesigns();
-        void SaveRocketDesign(RocketDesign rocketDesign);
+        RocketDesign SaveRocketDesign(UnsavedRocketDesign rocketDesign);
     }
 }
