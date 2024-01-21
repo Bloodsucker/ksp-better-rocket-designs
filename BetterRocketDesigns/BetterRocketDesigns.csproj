@@ -66,9 +66,10 @@
     <Compile Include="BetterRocketDesigns.cs" />
     <Compile Include="adapters\IConfigNodeAdapter.cs" />
     <Compile Include="IRocketDesignLoader.cs" />
+    <Compile Include="models\RocketDesign.cs" />
     <Compile Include="models\RocketDesignFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="models\RocketDesign.cs" />
+    <Compile Include="models\UnsavedRocketDesign.cs" />
     <Compile Include="ksp\RocketDesignLoader.cs" />
     <Compile Include="RocketDesignLoaderScreen\RocketDesignLoaderController.cs" />
     <Compile Include="RocketDesignLoaderScreen\RocketDesignLoaderUI.cs" />

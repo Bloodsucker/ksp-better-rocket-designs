@@ -14,36 +14,44 @@ namespace BetterRocketDesigns.ksp
             this.saveDirectoryPath = saveDirectoryPath;
         }
 
-        public List<IConfigNodeAdapter> LoadAllRocketDesigns()
+        public List<RocketDesign> LoadAllRocketDesigns()
         {
-            List<IConfigNodeAdapter> craftList = new List<IConfigNodeAdapter>();
+            List<RocketDesign> rocketDesigns = new List<RocketDesign>();
 
             string fullRocketDesignFolderPath = getFullRocketDesignFolderPath();
 
-            if (!Directory.Exists(fullRocketDesignFolderPath)) return craftList;
+            if (!Directory.Exists(fullRocketDesignFolderPath)) return rocketDesigns;
 
             string[] craftFiles = Directory.GetFiles(getFullRocketDesignFolderPath(), "*.craft");
 
             foreach (string craftFile in craftFiles)
             {
                 ConfigNode configNode = ConfigNode.Load(craftFile);
+                IConfigNodeAdapter configNodeAdapter = new ConfigNodeAdapter(configNode);
 
-                craftList.Add(new ConfigNodeAdapter(configNode));
+                RocketDesign rocketDesign = new RocketDesign(configNodeAdapter, craftFile);
+
+                rocketDesigns.Add(rocketDesign);
             }
 
-            return craftList;
+            return rocketDesigns;
         }
 
-        public void SaveRocketDesign(string fileName, IConfigNodeAdapter configNode)
+        public RocketDesign SaveRocketDesign(UnsavedRocketDesign rocketDesign)
         {
             if(!Directory.Exists(getFullRocketDesignFolderPath()))
             {
                 Directory.CreateDirectory(getFullRocketDesignFolderPath());
             }
 
-            string craftFilePath = Path.Combine(getFullRocketDesignFolderPath(), $"{fileName}.craft");
+            string filename = rocketDesign.Name;
+            IConfigNodeAdapter configNode = rocketDesign.ConfigNode;
+
+            string craftFilePath = Path.Combine(getFullRocketDesignFolderPath(), $"{filename}.craft");
 
             configNode.Save(craftFilePath);
+
+            return new RocketDesign(configNode, craftFilePath);
         }
 
         private string getFullRocketDesignFolderPath()

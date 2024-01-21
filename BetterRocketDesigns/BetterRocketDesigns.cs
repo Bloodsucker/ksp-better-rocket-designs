@@ -92,7 +92,7 @@ namespace BetterRocketDesigns
 
             ConfigNode cn = CraftTools.TransformAsConfigNode(detachedPart);
             ConfigNodeAdapter configNode = new ConfigNodeAdapter(cn);
-            RocketDesign newRocketDesign = new RocketDesign(configNode);
+            UnsavedRocketDesign newRocketDesign = new UnsavedRocketDesign(configNode);
 
             RocketDesignSaverUI rocketDesignSaverUI = new GameObject("RocketDesignSaverUI")
                  .AddComponent<RocketDesignSaverUI>();

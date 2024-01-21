@@ -7,14 +7,14 @@ namespace BetterRocketDesigns.RocketDesignSaverScreen
 {
     internal class RocketDesignSaverController
     {
-        private readonly RocketDesign _newRocketDesign;
+        private readonly UnsavedRocketDesign _newRocketDesign;
         private readonly RocketDesignSaverUI _ui;
         private readonly RocketDesignManager _rocketDesignManager;
         public event Action OnComplete;
 
         private RocketDesignFilter _rocketDesignFilter = new RocketDesignFilter();
 
-        public RocketDesignSaverController(RocketDesign newRocketDesign, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
+        public RocketDesignSaverController(UnsavedRocketDesign newRocketDesign, RocketDesignSaverUI ui, RocketDesignManager rocketDesignManager)
         {
             _newRocketDesign = newRocketDesign;
 

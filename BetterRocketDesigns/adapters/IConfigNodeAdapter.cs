@@ -11,7 +11,7 @@ namespace BetterRocketDesigns
         void GetValues(string name, out List<string> values);
 
         void SetValue(string key, string value);
-        void SetValue(string key, IReadOnlyList<string> value);
+        void SetValue(string key, IReadOnlyCollection<string> value);
         void SetValue(string key, IReadOnlyDictionary<string, float> value);
 
         void AddValue(string key, string value);
