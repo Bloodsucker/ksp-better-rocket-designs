@@ -35,5 +35,4 @@ jobs:
     - name: Delete latest canary release
       run: gh release delete canary -y || true
     - name: Release new canary
-      if: failure()
       run: gh release create canary --prerelease --target develop --title canary ${{ steps.release-files.outputs.release_zip }}
