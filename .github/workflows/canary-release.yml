@@ -32,10 +32,8 @@ jobs:
         mkdir -p $RUNNER_TEMP/release
         mv ${{ steps.build-mod.outputs.zip_path }} $RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip
         echo "release_zip=$RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip" >> $GITHUB_OUTPUT
-    - name: Check if canary tag exists
-      run: gh release view canary
     - name: Delete latest canary release
-      if: failure()
       run: gh release delete canary -y
     - name: Release new canary
+      if: failure()
       run: gh release create canary ${{ steps.release-files.outputs.release_zip }}
