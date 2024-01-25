@@ -1,0 +1,39 @@
+name: Nightly Release
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  nightly-release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Bump version (canary)
+      run: |
+        SHORT_VERSION=$(python3 update-version.py get-version --short)
+        NEW_VERSION="${SHORT_VERSION}-SNAPSHOT-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
+        NEW_ASSEMBLY_VERSION="${SHORT_VERSION%.*}.0"
+        python3 update-version.py update-version --new-version $NEW_VERSION --new-assembly-version $NEW_ASSEMBLY_VERSION
+        git diff
+    - id: build-mod
+      uses: ./.github/actions/build-mod
+      with:
+        ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
+        ksp_dlls_password: ${{ secrets.KSP_DLLS_PASSWORD }}
+        tmp_path: ${{ runner.temp }}
+    - name: Preparing Release files
+      id: release-files
+      run: |
+        mkdir -p $RUNNER_TEMP/release
+        mv ${{ steps.build-mod.outputs.zip_path }} $RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip
+        echo "release_zip=$RUNNER_TEMP/release/BetterRocketDesigns-${{ github.ref_name }}.zip" >> $GITHUB_OUTPUT
+    - name: Delete latest canary release
+      run: gh release delete canary -y
+    - name: Release new canary
+      if: failure()
+      run: gh release create canary ${{ steps.release-files.outputs.release_zip }}
