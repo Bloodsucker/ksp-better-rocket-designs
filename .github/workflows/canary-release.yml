@@ -18,7 +18,7 @@ jobs:
       run: |
         SHORT_VERSION=$(python3 update-version.py get-version --short)
         NEW_VERSION="${SHORT_VERSION}-SNAPSHOT-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
-        NEW_ASSEMBLY_VERSION="${SHORT_VERSION%.*}.0"
+        NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
         python3 update-version.py update-version --new-version $NEW_VERSION --new-assembly-version $NEW_ASSEMBLY_VERSION
         git --no-pager diff
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
