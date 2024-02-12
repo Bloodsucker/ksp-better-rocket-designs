@@ -37,5 +37,6 @@ jobs:
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
           git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
-          git log --oneline --graph -n 5
-          git push origin master --tags
+          git checkout develop
+          git merge master
+          git push origin master develop --tags
