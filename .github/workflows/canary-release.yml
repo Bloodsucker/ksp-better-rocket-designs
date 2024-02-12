@@ -21,7 +21,7 @@ jobs:
         NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
         python3 update-version.py update-version --new-version "$NEW_VERSION" --new-assembly-version $NEW_ASSEMBLY_VERSION
         git --no-pager diff
-        echo "new_version='$NEW_VERSION'" >> $GITHUB_OUTPUT
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
     - id: build-mod
       uses: ./.github/actions/build-mod
       with:
