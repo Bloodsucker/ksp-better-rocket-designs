@@ -23,6 +23,7 @@ package:
 	cp "./BetterRocketDesigns/bin/$(CONFIG)/BetterRocketDesigns.dll" "$(PACKAGE_FILE_DESTINATION)/BetterRocketDesigns.dll"
 	cp -R "./BetterRocketDesigns/Textures" "$(PACKAGE_FILE_DESTINATION)/Textures"
 	cp "./README.md" "$(PACKAGE_FILE_DESTINATION)/README.md"
+	cp "./LICENSE" "$(PACKAGE_FILE_DESTINATION)/LICENSE"
 	cd "$(PACKAGE_ZIP_ROOT_FOLDER)" && zip -r $(ZIP_PATH) *
 
 clean:
