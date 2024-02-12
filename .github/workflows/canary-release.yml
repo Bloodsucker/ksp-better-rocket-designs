@@ -38,4 +38,4 @@ jobs:
     - name: Delete latest canary release
       run: gh release delete canary -y || true
     - name: Release new canary
-      run: gh release create canary --prerelease --generate-notes --target develop --title 'Canary (v${{ steps.bump-version.outputs.new_version }})' ${{ steps.release-files.outputs.release_zip }}
+      run: gh release create canary --prerelease --generate-notes --target develop --title 'Canary (v${{ steps.bump-version.outputs.new_version }})' '${{ steps.release-files.outputs.release_zip }}'
