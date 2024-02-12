@@ -18,12 +18,6 @@ jobs:
       - name: Bummping version
         run: python3 update-version.py ${{ inputs.new_version }}
       - run: git status
-      - id: build-mod
-        uses: ./.github/actions/build-mod
-        with:
-          ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
-          ksp_dlls_password: ${{ secrets.KSP_DLLS_PASSWORD }}
-          tmp_path: ${{ runner.temp }}
       - name: Setup git config
         run: |
           git config user.name "Github Actions Bot"
@@ -37,5 +31,6 @@ jobs:
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
           git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
-          git log --oneline --graph -n 5
-          git push origin master --tags
+          git checkout develop
+          git merge master
+          git push origin master develop --tags

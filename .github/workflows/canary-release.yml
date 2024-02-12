@@ -17,12 +17,11 @@ jobs:
       id: bump-version
       run: |
         SHORT_VERSION=$(python3 update-version.py get-version --short)
-        NEW_VERSION="${SHORT_VERSION}-SNAPSHOT-$(date +'%y%m%d%H%M%S')-$(git rev-parse --short HEAD)"
+        NEW_VERSION="${SHORT_VERSION}-SNAPSHOT-$(git rev-parse --short HEAD)#$(date +'%y%m%d%H%M%S')"
         NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
         python3 update-version.py update-version --new-version $NEW_VERSION --new-assembly-version $NEW_ASSEMBLY_VERSION
         git --no-pager diff
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        echo "NEW_ASSEMBLY_VERSION=$NEW_ASSEMBLY_VERSION" >> $GITHUB_OUTPUT
     - id: build-mod
       uses: ./.github/actions/build-mod
       with:
@@ -39,4 +38,4 @@ jobs:
     - name: Delete latest canary release
       run: gh release delete canary -y || true
     - name: Release new canary
-      run: gh release create canary --prerelease --generate-notes --target develop --title canary ${{ steps.release-files.outputs.release_zip }}
+      run: gh release create canary --prerelease --generate-notes --target develop --title 'Canary (v${{ steps.bump-version.outputs.new_version }})' ${{ steps.release-files.outputs.release_zip }}
