@@ -24,6 +24,7 @@ package:
 	cp -R "./BetterRocketDesigns/Textures" "$(PACKAGE_FILE_DESTINATION)/Textures"
 	cp "./README.md" "$(PACKAGE_FILE_DESTINATION)/README.md"
 	cp "./LICENSE" "$(PACKAGE_FILE_DESTINATION)/LICENSE"
+	python3 update-version.py get-version > "$(PACKAGE_FILE_DESTINATION)/VERSION"
 	cd "$(PACKAGE_ZIP_ROOT_FOLDER)" && zip -r $(ZIP_PATH) *
 
 clean:
