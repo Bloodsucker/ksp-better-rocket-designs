@@ -15,6 +15,8 @@ jobs:
         run: |
           [[ "${{ inputs.new_version }}" ]] || { echo "new_version input is empty" ; exit 1; }
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Bummping version
         run: |
           NEW_VERSION=${{ inputs.new_version }}
@@ -31,7 +33,6 @@ jobs:
           git checkout -b $RELEASE_BRANCH
           git add *
           git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
-          git fetch
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
           git tag -a "v${{ inputs.new_version }}" -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
