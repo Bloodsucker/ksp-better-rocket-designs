@@ -16,7 +16,10 @@ jobs:
           [[ "${{ inputs.new_version }}" ]] || { echo "new_version input is empty" ; exit 1; }
       - uses: actions/checkout@v4
       - name: Bummping version
-        run: python3 update-version.py ${{ inputs.new_version }}
+        run: |
+          NEW_VERSION=${{ inputs.new_version }}
+          NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
+          python3 update-version.py update-version --new-version ${{ inputs.new_version }} --new-assembly-version $NEW_ASSEMBLY_VERSION
       - run: git status
       - name: Setup git config
         run: |
@@ -30,7 +33,7 @@ jobs:
           git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
-          git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
+          git tag -a "v${{ inputs.new_version }}" -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
           git checkout develop
           git merge master
           git push origin master develop --tags
