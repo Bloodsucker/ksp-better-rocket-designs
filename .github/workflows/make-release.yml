@@ -19,7 +19,7 @@ jobs:
         run: |
           NEW_VERSION=${{ inputs.new_version }}
           NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
-          python3 update-version.py update-version --new-version ${{ inputs.new_version }} --new-assembly-version $NEW_ASSEMBLY_VERSION
+          python3 update-version.py update-version --new-version $NEW_VERSION --new-assembly-version $NEW_ASSEMBLY_VERSION
       - run: git status
       - name: Setup git config
         run: |
