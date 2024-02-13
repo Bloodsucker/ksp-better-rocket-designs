@@ -32,6 +32,16 @@ namespace BetterRocketDesigns.ksp
             configNode.SetValue(key, value);
         }
 
+        public void SetValue(string key, IReadOnlyCollection<string> values)
+        {
+            configNode.RemoveValues(key);
+
+            foreach (string value in values)
+            {
+                configNode.AddValue("labels", value);
+            }
+        }
+
         public void AddValue(string key, string value)
         {
             configNode.AddValue(key, value);
@@ -50,16 +60,6 @@ namespace BetterRocketDesigns.ksp
         public void GetValues(string name, out List<string> values)
         {
             values = configNode.GetValuesList(name);
-        }
-
-        public void SetValue(string key, IReadOnlyList<string> values)
-        {
-            configNode.RemoveValue(key);
-
-            foreach (string value in values)
-            {
-                configNode.AddValue("labels", value);
-            }
         }
     }
 }

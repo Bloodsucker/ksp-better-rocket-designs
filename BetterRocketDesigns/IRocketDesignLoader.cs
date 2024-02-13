@@ -4,7 +4,7 @@ namespace BetterRocketDesigns
 {
     internal interface IRocketDesignLoader
     {
-        List<IConfigNodeAdapter> LoadAllRocketDesigns();
-        void SaveRocketDesign(string fileName, IConfigNodeAdapter configNode);
+        List<RocketDesign> LoadAllRocketDesigns();
+        RocketDesign SaveRocketDesign(UnsavedRocketDesign rocketDesign);
     }
 }

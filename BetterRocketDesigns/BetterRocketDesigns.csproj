@@ -37,6 +37,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>$(KSP_DEV)\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="ClickThroughBlocker">
+      <HintPath>$(KSP_DEV)\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -66,9 +69,10 @@
     <Compile Include="BetterRocketDesigns.cs" />
     <Compile Include="adapters\IConfigNodeAdapter.cs" />
     <Compile Include="IRocketDesignLoader.cs" />
+    <Compile Include="models\RocketDesign.cs" />
     <Compile Include="models\RocketDesignFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="models\RocketDesign.cs" />
+    <Compile Include="models\UnsavedRocketDesign.cs" />
     <Compile Include="ksp\RocketDesignLoader.cs" />
     <Compile Include="RocketDesignLoaderScreen\RocketDesignLoaderController.cs" />
     <Compile Include="RocketDesignLoaderScreen\RocketDesignLoaderUI.cs" />

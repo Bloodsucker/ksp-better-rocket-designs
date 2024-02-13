@@ -1,86 +1,44 @@
-﻿using BetterRocketDesigns.utils;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BetterRocketDesigns
 {
-    internal class RocketDesign
+    class RocketDesign
     {
-        private IConfigNodeAdapter _configNode;
-        private string _name;
-        private List<string> _labels;
-        private Dictionary<string, float> _capabilities;
+        public IConfigNodeAdapter ConfigNode { get; private set; }
+        public string Name { get; private set; }
+        public IReadOnlyCollection<string> Labels { get; private set; }
+        public IReadOnlyDictionary<string, float> Capabilities { get; private set; }
+        public string CraftPath { get; private set; }
 
-        public RocketDesign(IConfigNodeAdapter configNode) {
-            ThumbnailImage = Tools.MakeTexture(32, 32, Color.magenta);
-            _configNode = configNode;
+        public RocketDesign(UnsavedRocketDesign unsavedRocket, string craftPat)
+        {
+            ConfigNode = unsavedRocket.ConfigNode;
+            CraftPath = craftPat;
 
             UpdatePropertiesFromConfigNode();
         }
 
-        public string Name
+        public RocketDesign(IConfigNodeAdapter configNode, string craftPath)
         {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                UpdateConfigNode();
-            }
-        }
+            CraftPath = craftPath;
+            ConfigNode = configNode;
 
-        public IReadOnlyList<string> Labels
-        {
-            get { return _labels; }
-            set
-            {
-                _labels = new List<string>(value);
-                UpdateConfigNode();
-            }
-        }
-
-        public IReadOnlyDictionary<string, float> Capabilities
-        {
-            get { return _capabilities; }
-            set
-            {
-                _capabilities = value.ToDictionary(pair => pair.Key, pair => pair.Value);
-                UpdateConfigNode();
-            }
-        }
-
-        private Texture2D _thumbnailImage;
-
-        public Texture2D ThumbnailImage
-        {
-            get { return _thumbnailImage; }
-            set { _thumbnailImage = value; }
-        }
-
-        public IConfigNodeAdapter ConfigNode {
-            get
-            {
-                return _configNode;
-            }
-
-            set
-            {
-                _configNode = value;
-                UpdatePropertiesFromConfigNode();
-            }
-        }
-        private void UpdateConfigNode()
-        {
-            _configNode.SetValue("ship", _name);
-            _configNode.SetValue("labels", _labels);
-            _configNode.SetValue("capabilities", _capabilities);
+            UpdatePropertiesFromConfigNode();
         }
 
         private void UpdatePropertiesFromConfigNode()
         {
-            _name = _configNode.GetValue("ship");
-            _configNode.GetValues("labels", out _labels);
-            _configNode.GetValue("capabilities", out _capabilities);
+            Name = ConfigNode.GetValue("ship");
+
+            ConfigNode.GetValues("labels", out List<string> labels);
+            Labels = new SortedSet<string>(labels);
+
+            ConfigNode.GetValue("capabilities", out Dictionary<string, float> capabilities);
+            Capabilities = capabilities;
         }
     }
 }

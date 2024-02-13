@@ -15,14 +15,14 @@ jobs:
         run: |
           [[ "${{ inputs.new_version }}" ]] || { echo "new_version input is empty" ; exit 1; }
       - uses: actions/checkout@v4
-      - name: Bummping version
-        run: python3 update-version.py ${{ inputs.new_version }}
-      - run: git status
-      - id: build-mod
-        uses: ./.github/actions/build-mod
         with:
-          ksp_dlls_donwload_url: ${{ secrets.KSP_DLLS_DONWLOAD_URL }}
-          tmp_path: ${{ runner.temp }}
+          fetch-depth: 0
+      - name: Bummping version
+        run: |
+          NEW_VERSION=${{ inputs.new_version }}
+          NEW_ASSEMBLY_VERSION="${SHORT_VERSION}.0"
+          python3 update-version.py update-version --new-version $NEW_VERSION --new-assembly-version $NEW_ASSEMBLY_VERSION
+      - run: git status
       - name: Setup git config
         run: |
           git config user.name "Github Actions Bot"
@@ -35,6 +35,7 @@ jobs:
           git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
-          git tag -a v${{ inputs.new_version }} -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
-          git log --oneline --graph -n 5
-          git push origin master --tags
+          git tag -a "v${{ inputs.new_version }}" -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
+          git checkout develop
+          git merge master
+          git push origin master develop --tags

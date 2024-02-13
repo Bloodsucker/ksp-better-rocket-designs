@@ -4,7 +4,8 @@ dlls_abs_path := $(abspath $(DLLS_PATH))
 
 OUTPUT_PATH := "./build/bin"
 CONFIG_OUTPUT_PATH := "$(OUTPUT_PATH)/$(CONFIG)"
-CONFIG_PACKAGE_OUTPUT_PATH := "$(OUTPUT_PATH)/$(CONFIG)/package"
+PACKAGE_ZIP_ROOT_FOLDER := "$(OUTPUT_PATH)/$(CONFIG)/package"
+PACKAGE_FILE_DESTINATION := "$(PACKAGE_ZIP_ROOT_FOLDER)/GameData/BetterRocketDesigns"
 ZIP_PATH := $(abspath $(CONFIG_OUTPUT_PATH)/BetterRocketDesigns.zip)
 
 all: clean release
@@ -18,11 +19,13 @@ debug:
 	$(MAKE) package CONFIG=Debug
 
 package:
-	mkdir -p "$(CONFIG_PACKAGE_OUTPUT_PATH)"
-	cp "./BetterRocketDesigns/bin/$(CONFIG)/BetterRocketDesigns.dll" "$(CONFIG_PACKAGE_OUTPUT_PATH)/BetterRocketDesigns.dll"
-	cp -R "./BetterRocketDesigns/Textures" "$(CONFIG_PACKAGE_OUTPUT_PATH)/Textures"
-	cp "./README.md" "$(CONFIG_PACKAGE_OUTPUT_PATH)/README.md"
-	cd "$(CONFIG_PACKAGE_OUTPUT_PATH)" && zip -r $(ZIP_PATH) *
+	mkdir -p "$(PACKAGE_FILE_DESTINATION)"
+	cp "./BetterRocketDesigns/bin/$(CONFIG)/BetterRocketDesigns.dll" "$(PACKAGE_FILE_DESTINATION)/BetterRocketDesigns.dll"
+	cp -R "./BetterRocketDesigns/Textures" "$(PACKAGE_FILE_DESTINATION)/Textures"
+	cp "./README.md" "$(PACKAGE_FILE_DESTINATION)/README.md"
+	cp "./LICENSE" "$(PACKAGE_FILE_DESTINATION)/LICENSE"
+	python3 update-version.py get-version > "$(PACKAGE_FILE_DESTINATION)/VERSION"
+	cd "$(PACKAGE_ZIP_ROOT_FOLDER)" && zip -r $(ZIP_PATH) *
 
 clean:
 	msbuild /t:Clean /p:Configuration=Release BetterRocketDesigns.sln

@@ -66,7 +66,7 @@ namespace BetterRocketDesigns.RocketDesignLoaderScreen
             {
                 ConfigNode configNode = adapter.GetOriginalInstance();
                 ShipTemplate subassembly = new ShipTemplate();
-                subassembly.LoadShip(configNode);
+                subassembly.LoadShip(design.CraftPath, configNode);
                 EditorLogic.fetch.SpawnTemplate(subassembly);
 
                 MonoBehaviour.Destroy(_ui.gameObject);
