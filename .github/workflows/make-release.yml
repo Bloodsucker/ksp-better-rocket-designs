@@ -31,6 +31,7 @@ jobs:
           git checkout -b $RELEASE_BRANCH
           git add *
           git commit -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
+          git fetch
           git checkout master
           git merge --no-ff $RELEASE_BRANCH -m "Merge branch '$RELEASE_BRANCH' into master"
           git tag -a "v${{ inputs.new_version }}" -m "New release BetterRocketDesigns v${{ inputs.new_version }}"
