@@ -17,7 +17,7 @@ namespace BetterRocketDesigns
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class BetterRocketDesigns : MonoBehaviour
     {
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.1.0";
 
         private RocketDesignManager _rocketDesignManager;
         private ApplicationLauncherButton _toolbarButton;
